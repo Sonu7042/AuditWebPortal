@@ -7,7 +7,7 @@ import {
   MapPin,
   Calendar,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function TechnicalProjectReport() {
   const navigate = useNavigate();
@@ -28,7 +28,9 @@ export default function TechnicalProjectReport() {
 
       {/* ===== Top Header ===== */}
       <div className="h-14 flex items-center justify-center relative border-b border-gray-300 bg-[#f5f6f7]">
+         <Link to="/dashboard" >
         <ArrowLeft className="absolute left-4 text-gray-600" size={20} />
+         </Link>
         <h1 className="text-sm tracking-widest font-medium text-gray-700">
           TECHNICAL PROJECT REPORT
         </h1>
