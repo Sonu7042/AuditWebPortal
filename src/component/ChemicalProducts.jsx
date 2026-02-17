@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function ChemicalProducts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [selectedMachinery, setSelectedMachinery] = useState([]);
 
   const machineryList = [
     "Electronic Texture Sprayer RTX-2500PC Graco",
@@ -24,10 +25,17 @@ export default function ChemicalProducts() {
     "Pipe Cutter Machine DW871 Dewalt",
   ];
 
-  // ✅ Filter Logic
   const filteredList = machineryList.filter((item) =>
     item.toLowerCase().includes(search.toLowerCase())
   );
+
+  const toggleMachinery = (item) => {
+    if (selectedMachinery.includes(item)) {
+      setSelectedMachinery(selectedMachinery.filter((m) => m !== item));
+    } else {
+      setSelectedMachinery([...selectedMachinery, item]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-6">
@@ -38,14 +46,13 @@ export default function ChemicalProducts() {
           
           <div>
             <h1 className="text-xl font-semibold text-gray-700">
-              MACHINERY
+              Chemical Products
             </h1>
             <p className="text-sm text-gray-500">
-              Total: {filteredList.length} (20 present in project and 0 Non-conformities)
+              Total: {filteredList.length}
             </p>
           </div>
 
-          {/* Search + Home */}
           <div className="flex items-center gap-3 w-full md:w-auto">
             
             <div className="relative w-full md:w-72">
@@ -58,7 +65,6 @@ export default function ChemicalProducts() {
               />
             </div>
 
-            {/* Home Icon */}
             <button
               onClick={() => navigate("/")}
               className="p-2 border border-gray-300 rounded-md hover:bg-gray-100 transition"
@@ -70,14 +76,6 @@ export default function ChemicalProducts() {
         </div>
       </div>
 
-      {/* Project Title */}
-      <div className="mb-4">
-        <h2 className="text-sm md:text-base font-medium text-gray-700">
-          INDERJEET BROS PROJECTS PVT. LTD.: (IN) - Total: {filteredList.length}
-          (15 present in project and 0 Non-conformities)
-        </h2>
-      </div>
-
       {/* Machinery Grid */}
       <div className="grid gap-6 
                       grid-cols-1 
@@ -86,25 +84,40 @@ export default function ChemicalProducts() {
                       lg:grid-cols-4">
 
         {filteredList.length > 0 ? (
-          filteredList.map((item, index) => (
-            <div
-              key={index}
-              className="bg-green-50 border border-green-200 rounded-xl p-6 relative shadow-sm hover:shadow-lg transition duration-300 min-h-[160px] flex flex-col justify-between"
-            >
-              {/* Check Icon */}
-              <div className="absolute top-4 right-4 text-green-600">
-                <Check size={22} />
+          filteredList.map((item, index) => {
+            const isSelected = selectedMachinery.includes(item);
+
+            return (
+              <div
+                key={index}
+                onClick={() => toggleMachinery(item)}
+                className={`rounded-xl p-6 relative shadow-sm hover:shadow-lg transition duration-300 min-h-[160px] flex flex-col justify-between cursor-pointer
+                  ${
+                    isSelected
+                      ? "bg-green-50 border border-green-200"
+                      : "bg-white border border-gray-200"
+                  }`}
+              >
+                {isSelected && (
+                  <div className="absolute top-4 right-4 text-green-600">
+                    <Check size={22} />
+                  </div>
+                )}
+
+                <h3 className="text-sm font-semibold text-gray-700 leading-tight">
+                  {item}
+                </h3>
+
+                <p
+                  className={`text-sm font-semibold mt-4 ${
+                    isSelected ? "text-green-600" : "text-gray-400"
+                  }`}
+                >
+                  {isSelected ? "VALID" : "NOT CHECKED"}
+                </p>
               </div>
-
-              <h3 className="text-sm font-semibold text-gray-700 leading-tight">
-                {item}
-              </h3>
-
-              <p className="text-sm font-semibold text-green-600 mt-4">
-                VALID
-              </p>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="col-span-full text-center text-gray-400 py-10">
             No machinery found
@@ -114,11 +127,17 @@ export default function ChemicalProducts() {
 
       {/* Bottom Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3 mt-8">
-        <Link to={'/createNonConformity'} className="border border-blue-500 text-blue-500 px-5 py-2 rounded-md hover:bg-blue-50 transition">
+        <Link
+          to={"/createNonConformity"}
+          className="border border-blue-500 text-blue-500 px-5 py-2 rounded-md hover:bg-blue-50 transition"
+        >
           Create Non-conformity
         </Link>
 
-        <Link to={"/nonConformities"} className="border border-gray-400 text-gray-600 px-5 py-2 rounded-md hover:bg-gray-100 transition">
+        <Link
+          to={"/nonConformities"}
+          className="border border-gray-400 text-gray-600 px-5 py-2 rounded-md hover:bg-gray-100 transition"
+        >
           See Non-conformities
         </Link>
       </div>

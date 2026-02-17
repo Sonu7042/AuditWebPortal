@@ -3,7 +3,6 @@ import React, { createContext, useState } from "react";
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-
   // 🔹 WORK PAGE FORM DATA
   const [formData, setFormData] = useState({
     subcontractedCompany: "",
@@ -16,6 +15,9 @@ export const AppProvider = ({ children }) => {
 
   const [savedMachinery, setSavedMachinery] = useState([]);
 
+  const [visitedSections, setVisitedSections] = useState([]);
+
+
   // 🔹 AUDIT SECTIONS DATA
   const [auditSections, setAuditSections] = useState([
     {
@@ -24,27 +26,30 @@ export const AppProvider = ({ children }) => {
       questions: [
         {
           id: 1,
-          question: "Is project scope clearly defined as per ISO 9001 requirements?",
+          question:
+            "Is project scope clearly defined as per ISO 9001 requirements?",
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
+          description: "",
         },
         {
           id: 2,
-          question: "Are risk assessments conducted before starting site activities?",
+          question:
+            "Are risk assessments conducted before starting site activities?",
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
+          description: "",
         },
         {
           id: 3,
-          question: "Is documented information properly controlled and updated?",
+          question:
+            "Is documented information properly controlled and updated?",
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
+          description: "",
         },
         {
           id: 4,
@@ -52,7 +57,7 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
+          description: "",
         },
         {
           id: 5,
@@ -60,9 +65,9 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
-        }
-      ]
+          description: "",
+        },
+      ],
     },
 
     {
@@ -75,7 +80,7 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
+          description: "",
         },
         {
           id: 2,
@@ -83,7 +88,7 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
+          description: "",
         },
         {
           id: 3,
@@ -91,7 +96,7 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
+          description: "",
         },
         {
           id: 4,
@@ -99,9 +104,9 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
-        }
-      ]
+          description: "",
+        },
+      ],
     },
 
     {
@@ -114,7 +119,7 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
+          description: "",
         },
         {
           id: 2,
@@ -122,9 +127,9 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
-        }
-      ]
+          description: "",
+        },
+      ],
     },
 
     {
@@ -137,9 +142,9 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
-        }
-      ]
+          description: "",
+        },
+      ],
     },
 
     {
@@ -152,9 +157,9 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
-        }
-      ]
+          description: "",
+        },
+      ],
     },
 
     {
@@ -167,57 +172,51 @@ export const AppProvider = ({ children }) => {
           status: "na",
           isSynced: false,
           images: [],
-          description: ""
-        }
-      ]
-    }
+          description: "",
+        },
+      ],
+    },
   ]);
 
   // 🔥 SAVE (Editable)
   const updateQuestionStatus = (sectionId, questionId, status, data) => {
-    setAuditSections(prev =>
-      prev.map(section =>
+    setAuditSections((prev) =>
+      prev.map((section) =>
         section.id === sectionId
           ? {
               ...section,
-              questions: section.questions.map(q =>
+              questions: section.questions.map((q) =>
                 q.id === questionId
                   ? {
                       ...q,
                       status,
-                      images: [
-                        data.descriptionImage,
-                        data.correctiveImage
-                      ],
-                      description: data.description
+                      images: [data.descriptionImage, data.correctiveImage],
+                      description: data.description,
                     }
-                  : q
-              )
+                  : q,
+              ),
             }
-          : section
-      )
+          : section,
+      ),
     );
   };
 
   // 🔥 SYNCHRONISE (Lock)
   // 🔒 SYNCHRONISE (LOCK QUESTION)
-const synchroniseQuestion = (sectionId, questionId) => {
-  setAuditSections(prev =>
-    prev.map(section =>
-      section.id === sectionId
-        ? {
-            ...section,
-            questions: section.questions.map(q =>
-              q.id === questionId
-                ? { ...q, isSynced: true }
-                : q
-            )
-          }
-        : section
-    )
-  );
-};
-
+  const synchroniseQuestion = (sectionId, questionId) => {
+    setAuditSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              questions: section.questions.map((q) =>
+                q.id === questionId ? { ...q, isSynced: true } : q,
+              ),
+            }
+          : section,
+      ),
+    );
+  };
 
   return (
     <AppContext.Provider
@@ -228,7 +227,9 @@ const synchroniseQuestion = (sectionId, questionId) => {
         setSavedMachinery,
         auditSections,
         updateQuestionStatus,
-        synchroniseQuestion
+        synchroniseQuestion,
+        visitedSections,
+        setVisitedSections,
       }}
     >
       {children}

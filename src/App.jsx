@@ -18,6 +18,7 @@ import PendingNonCompliance from "./component/PendingNonCompliance.jsx";
 import CloseNonComplianceReport from "./component/CloseNonComplianceReport.jsx";
 import AuditChecklist from "./component/AuditChecklist.jsx";
 import WorkPage from "./component/WorkPage.jsx";
+import VisitSheet from "./component/VisitSheet.jsx";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path="/chemicalProducts" element={<ChemicalProducts />} />
           <Route path="/nonConformities" element={<NonConformitiesPage />} />
           <Route path="/createNonConformity" element={<CreateNonConformity />} />
+          <Route path="/visitSheet" element={<VisitSheet />} />
         </Routes>
       </Router>
     </AppProvider>

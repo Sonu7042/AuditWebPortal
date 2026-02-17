@@ -10,10 +10,15 @@ import {
   Wrench,
 } from "lucide-react";
 import { AppContext } from "../context/AppContext";
+import { useNavigate } from "react-router-dom";
+
 
 export default function CreateNonConformity() {
   const { formData, setFormData, savedMachinery, setSavedMachinery } =
     useContext(AppContext);
+
+
+    const navigate = useNavigate();
 
   // ✅ HANDLE TEXT CHANGE
   const handleChange = (e) => {
@@ -44,24 +49,23 @@ export default function CreateNonConformity() {
     formData.descriptionImage !== null &&
     formData.correctiveImage !== null;
 
-  const handleSave = () => {
-    if (!isFormValid) return;
+ const handleSave = () => {
+  if (!isFormValid) return;
 
-    // ✅ Add new machinery to list
-    setSavedMachinery((prev) => [...prev, formData]);
+  setSavedMachinery((prev) => [...prev, formData]);
 
-    console.log("Saved Data:", formData);
+  setFormData({
+    subcontractedCompany: "",
+    machinery: "",
+    description: "",
+    correctiveMeasure: "",
+    descriptionImage: null,
+    correctiveImage: null,
+  });
 
-    // Optional: reset form
-    setFormData({
-      subcontractedCompany: "",
-      machinery: "",
-      description: "",
-      correctiveMeasure: "",
-      descriptionImage: null,
-      correctiveImage: null,
-    });
-  };
+  // ✅ Redirect
+  navigate("/machine");
+};
 
   const handleSync = () => {
     if (!isFormValid) return;

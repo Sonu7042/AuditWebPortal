@@ -6,8 +6,13 @@ import {
   Globe,
   Info,
 } from "lucide-react";
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
 export default function NonConformitiesPage() {
+
+  const { savedMachinery } = useContext(AppContext);
+  
   return (
     <div className="min-h-screen bg-[#f5f6f7] flex flex-col">
 
@@ -83,22 +88,69 @@ export default function NonConformitiesPage() {
         <div>Delete</div>
       </div>
 
-      {/* Empty State */}
-      <div className="flex-1 flex flex-col items-center justify-center text-center bg-white">
+      {/* 🔥 DATA OR EMPTY STATE */}
+      {savedMachinery.length > 0 ? (
 
-        <div className="w-14 h-14 rounded-full border border-gray-400 flex items-center justify-center mb-4">
-          <Info size={24} className="text-gray-500" />
+        savedMachinery.map((item, index) => (
+          <div
+            key={index}
+            className="bg-white border-b px-6 py-4 text-sm hidden md:grid grid-cols-7 items-center"
+          >
+            {/* ID */}
+            <div>{index + 1}</div>
+
+            {/* Machinery */}
+            <div className="font-medium text-gray-800">
+              {item.machinery}
+            </div>
+
+            {/* Date of Incident */}
+            <div>
+              {new Date().toLocaleDateString()}
+            </div>
+
+            {/* Date of Closure */}
+            <div className="text-gray-400">
+              -
+            </div>
+
+            {/* Synchronisation */}
+            <div className="text-orange-500 font-medium">
+              Pending
+            </div>
+
+            {/* Recurring */}
+            <div className="text-gray-400">
+              No
+            </div>
+
+            {/* Delete */}
+            <div className="text-red-500 cursor-pointer">
+              Delete
+            </div>
+          </div>
+        ))
+
+      ) : (
+
+        /* 🔹 ORIGINAL EMPTY STATE (UNCHANGED) */
+        <div className="flex-1 flex flex-col items-center justify-center text-center bg-white">
+
+          <div className="w-14 h-14 rounded-full border border-gray-400 flex items-center justify-center mb-4">
+            <Info size={24} className="text-gray-500" />
+          </div>
+
+          <h2 className="text-gray-600 text-sm font-semibold tracking-wide">
+            THERE ARE NO NON-CONFORMITIES FOR THIS REPORT
+          </h2>
+
+          <p className="text-gray-400 text-xs mt-2">
+            The user has not opened any Non-conformities associated with this section
+          </p>
+
         </div>
 
-        <h2 className="text-gray-600 text-sm font-semibold tracking-wide">
-          THERE ARE NO NON-CONFORMITIES FOR THIS REPORT
-        </h2>
-
-        <p className="text-gray-400 text-xs mt-2">
-          The user has not opened any Non-conformities associated with this section
-        </p>
-
-      </div>
+      )}
 
     </div>
   );

@@ -1,13 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Check, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { AppContext } from "../context/AppContext";
 
 export default function MachineryPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [selectedMachinery, setSelectedMachinery] = useState([]); // ✅ manual check state
-  const { savedMachinery } = useContext(AppContext);
+  const [selectedMachinery, setSelectedMachinery] = useState([]);
 
   const machineryList = [
     "Electronic Texture Sprayer RTX-2500PC Graco",
@@ -27,16 +25,10 @@ export default function MachineryPage() {
     "Pipe Cutter Machine DW871 Dewalt",
   ];
 
-  const combinedList = [
-    ...machineryList,
-    ...savedMachinery.map((item) => item.machinery),
-  ];
-
-  const filteredList = combinedList.filter((item) =>
+  const filteredList = machineryList.filter((item) =>
     item.toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ Toggle Function
   const toggleMachinery = (item) => {
     if (selectedMachinery.includes(item)) {
       setSelectedMachinery(selectedMachinery.filter((m) => m !== item));
@@ -98,7 +90,7 @@ export default function MachineryPage() {
             return (
               <div
                 key={index}
-                onClick={() => toggleMachinery(item)} // ✅ manual click
+                onClick={() => toggleMachinery(item)}
                 className={`rounded-xl p-6 relative shadow-sm hover:shadow-lg transition duration-300 min-h-[160px] flex flex-col justify-between cursor-pointer
                   ${
                     isSelected
@@ -106,7 +98,6 @@ export default function MachineryPage() {
                       : "bg-white border border-gray-200"
                   }`}
               >
-                {/* Show Check Only If Selected */}
                 {isSelected && (
                   <div className="absolute top-4 right-4 text-green-600">
                     <Check size={22} />
@@ -136,11 +127,17 @@ export default function MachineryPage() {
 
       {/* Bottom Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3 mt-8">
-        <Link to={"/createNonConformity"} className="border border-blue-500 text-blue-500 px-5 py-2 rounded-md hover:bg-blue-50 transition">
+        <Link
+          to={"/createNonConformity"}
+          className="border border-blue-500 text-blue-500 px-5 py-2 rounded-md hover:bg-blue-50 transition"
+        >
           Create Non-conformity
         </Link>
 
-        <Link to={"/nonConformities"} className="border border-gray-400 text-gray-600 px-5 py-2 rounded-md hover:bg-gray-100 transition">
+        <Link
+          to={"/nonConformities"}
+          className="border border-gray-400 text-gray-600 px-5 py-2 rounded-md hover:bg-gray-100 transition"
+        >
           See Non-conformities
         </Link>
       </div>

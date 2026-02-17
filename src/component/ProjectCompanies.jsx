@@ -136,7 +136,7 @@ export default function ProjectCompanies() {
     {
       title: "VISIT SHEET",
       icon: <FileSearch size={40} />,
-      link: "#"
+      link: "/visitSheet"
     },
   ];
 
