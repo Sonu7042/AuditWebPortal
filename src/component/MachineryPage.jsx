@@ -6,6 +6,7 @@ import { AppContext } from "../context/AppContext";
 export default function MachineryPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [selectedMachinery, setSelectedMachinery] = useState([]); // ✅ manual check state
   const { savedMachinery } = useContext(AppContext);
 
   const machineryList = [
@@ -26,16 +27,23 @@ export default function MachineryPage() {
     "Pipe Cutter Machine DW871 Dewalt",
   ];
 
-// Combine default list + saved list
-const combinedList = [
-  ...machineryList,
-  ...savedMachinery.map((item) => item.machinery),
-];
+  const combinedList = [
+    ...machineryList,
+    ...savedMachinery.map((item) => item.machinery),
+  ];
 
-const filteredList = combinedList.filter((item) =>
-  item.toLowerCase().includes(search.toLowerCase())
-);
+  const filteredList = combinedList.filter((item) =>
+    item.toLowerCase().includes(search.toLowerCase())
+  );
 
+  // ✅ Toggle Function
+  const toggleMachinery = (item) => {
+    if (selectedMachinery.includes(item)) {
+      setSelectedMachinery(selectedMachinery.filter((m) => m !== item));
+    } else {
+      setSelectedMachinery([...selectedMachinery, item]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-6">
@@ -49,11 +57,10 @@ const filteredList = combinedList.filter((item) =>
               MACHINERY
             </h1>
             <p className="text-sm text-gray-500">
-              Total: {filteredList.length} (20 present in project and 0 Non-conformities)
+              Total: {filteredList.length}
             </p>
           </div>
 
-          {/* Search + Home */}
           <div className="flex items-center gap-3 w-full md:w-auto">
             
             <div className="relative w-full md:w-72">
@@ -66,7 +73,6 @@ const filteredList = combinedList.filter((item) =>
               />
             </div>
 
-            {/* Home Icon */}
             <button
               onClick={() => navigate("/")}
               className="p-2 border border-gray-300 rounded-md hover:bg-gray-100 transition"
@@ -78,14 +84,6 @@ const filteredList = combinedList.filter((item) =>
         </div>
       </div>
 
-      {/* Project Title */}
-      <div className="mb-4">
-        <h2 className="text-sm md:text-base font-medium text-gray-700">
-          INDERJEET BROS PROJECTS PVT. LTD.: (IN) - Total: {filteredList.length}
-          (15 present in project and 0 Non-conformities)
-        </h2>
-      </div>
-
       {/* Machinery Grid */}
       <div className="grid gap-6 
                       grid-cols-1 
@@ -94,25 +92,41 @@ const filteredList = combinedList.filter((item) =>
                       lg:grid-cols-4">
 
         {filteredList.length > 0 ? (
-          filteredList.map((item, index) => (
-            <div
-              key={index}
-              className="bg-green-50 border border-green-200 rounded-xl p-6 relative shadow-sm hover:shadow-lg transition duration-300 min-h-[160px] flex flex-col justify-between"
-            >
-              {/* Check Icon */}
-              <div className="absolute top-4 right-4 text-green-600">
-                <Check size={22} />
+          filteredList.map((item, index) => {
+            const isSelected = selectedMachinery.includes(item);
+
+            return (
+              <div
+                key={index}
+                onClick={() => toggleMachinery(item)} // ✅ manual click
+                className={`rounded-xl p-6 relative shadow-sm hover:shadow-lg transition duration-300 min-h-[160px] flex flex-col justify-between cursor-pointer
+                  ${
+                    isSelected
+                      ? "bg-green-50 border border-green-200"
+                      : "bg-white border border-gray-200"
+                  }`}
+              >
+                {/* Show Check Only If Selected */}
+                {isSelected && (
+                  <div className="absolute top-4 right-4 text-green-600">
+                    <Check size={22} />
+                  </div>
+                )}
+
+                <h3 className="text-sm font-semibold text-gray-700 leading-tight">
+                  {item}
+                </h3>
+
+                <p
+                  className={`text-sm font-semibold mt-4 ${
+                    isSelected ? "text-green-600" : "text-gray-400"
+                  }`}
+                >
+                  {isSelected ? "VALID" : "NOT CHECKED"}
+                </p>
               </div>
-
-              <h3 className="text-sm font-semibold text-gray-700 leading-tight">
-                {item}
-              </h3>
-
-              <p className="text-sm font-semibold text-green-600 mt-4">
-                VALID
-              </p>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="col-span-full text-center text-gray-400 py-10">
             No machinery found
