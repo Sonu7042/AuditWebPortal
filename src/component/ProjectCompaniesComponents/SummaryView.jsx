@@ -1,7 +1,9 @@
 import React from "react";
 import { HelpCircle, AlertTriangle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-export default function SummaryView({ companies, setShowSummary, setShowCompanyReport }) {
+export default function SummaryView({ companies }) {
+    const navigate = useNavigate();
     return (
         <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
             {/* Summary Sub-header */}
@@ -15,7 +17,7 @@ export default function SummaryView({ companies, setShowSummary, setShowCompanyR
                 <div className="flex items-center gap-4">
                     <p className="text-xs text-gray-600 font-medium tracking-tight">Companies in the report</p>
                     <button
-                        onClick={() => setShowSummary(false)}
+                        onClick={() => navigate("/projecCompanies")}
                         className="px-4 py-1.5 text-xs border border-gray-300 text-gray-700 rounded-md font-bold uppercase hover:bg-gray-50 transition-colors"
                     >
                         Change companies
@@ -43,7 +45,7 @@ export default function SummaryView({ companies, setShowSummary, setShowCompanyR
                         </div>
                         <button
                             disabled={index !== 0}
-                            onClick={() => setShowCompanyReport(true)}
+                            onClick={() => navigate("/projecCompanies/report")}
                             className={`px-10 py-3 rounded-md font-bold text-xs uppercase border transition-all ${index === 0
                                 ? "border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white"
                                 : "border-gray-200 text-gray-200 cursor-not-allowed"

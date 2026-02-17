@@ -29,7 +29,7 @@ function App() {
           <Route path="/ListofProject" element={<ListofProject />} />
           <Route path="/projectReports" element={<ProjectReports />} />
           <Route path="/createReport" element={<TechnicalProjectReport />} />
-          <Route path="/projecCompanies" element={<ProjectCompanies />} />
+          <Route path="/projecCompanies/*" element={<ProjectCompanies />} />
           <Route path="/pendingNonCompliance" element={<PendingNonCompliance />} />
           <Route path="/close-nc/:id" element={<CloseNonComplianceReport />} />
 
