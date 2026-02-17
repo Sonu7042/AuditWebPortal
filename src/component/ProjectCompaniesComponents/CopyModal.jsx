@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 export default function CopyModal({ setSubmitted, setShowAttentionModal, setShowModal }) {
     const navigate = useNavigate();
     const handleAction = () => {
-        setSubmitted(true);
-        navigate("/projecCompanies/summary");
+        if (setSubmitted) setSubmitted(true);
+        navigate("/projecCompanies/summary", { replace: true });
         setShowAttentionModal(true);
         setShowModal(false);
     };
