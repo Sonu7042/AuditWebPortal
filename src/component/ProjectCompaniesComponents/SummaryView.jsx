@@ -17,7 +17,7 @@ export default function SummaryView({ companies }) {
                 <div className="flex items-center gap-4">
                     <p className="text-xs text-gray-600 font-medium tracking-tight">Companies in the report</p>
                     <button
-                        onClick={() => navigate("/projecCompanies")}
+                        onClick={() => navigate("/projecCompanies", { replace: true })}
                         className="px-4 py-1.5 text-xs border border-gray-300 text-gray-700 rounded-md font-bold uppercase hover:bg-gray-50 transition-colors"
                     >
                         Change companies
@@ -45,7 +45,7 @@ export default function SummaryView({ companies }) {
                         </div>
                         <button
                             disabled={index !== 0}
-                            onClick={() => navigate("/projecCompanies/report")}
+                            onClick={() => navigate("/projecCompanies/report", { replace: true })}
                             className={`px-10 py-3 rounded-md font-bold text-xs uppercase border transition-all ${index === 0
                                 ? "border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white"
                                 : "border-gray-200 text-gray-200 cursor-not-allowed"

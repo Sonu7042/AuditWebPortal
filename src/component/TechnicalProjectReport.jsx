@@ -7,9 +7,10 @@ import {
   MapPin,
   Calendar,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function TechnicalProjectReport() {
+  const navigate = useNavigate();
   // ===== Default Current Date =====
   const today = new Date().toISOString().split("T")[0];
 
@@ -36,7 +37,7 @@ export default function TechnicalProjectReport() {
       {/* ===== Split Layout ===== */}
       <div className="flex flex-1">
 
-      {/* ===== LEFT SIDE ===== */}
+        {/* ===== LEFT SIDE ===== */}
         <div className="w-1/2 border-r border-gray-300 flex flex-col">
 
           {/* Section Header */}
@@ -120,11 +121,14 @@ export default function TechnicalProjectReport() {
           </div>
 
           {/* Bottom Button */}
-          <Link to={"/projecCompanies"} className="absolute bottom-8 right-10">
-            <button className="px-5 py-2 text-sm border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 transition">
+          <div className="absolute bottom-8 right-10">
+            <button
+              onClick={() => navigate("/projecCompanies", { replace: true })}
+              className="px-5 py-2 text-sm border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 transition"
+            >
               Create report and continue
             </button>
-          </Link>
+          </div>
         </div>
       </div>
     </div>

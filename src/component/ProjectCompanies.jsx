@@ -32,10 +32,7 @@ import AttentionModal from "./ProjectCompaniesComponents/AttentionModal";
 export default function ProjectCompanies() {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedAudit, setSelectedAudit] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
   const [showAttentionModal, setShowAttentionModal] = useState(false);
-  const [showCompanyReport, setShowCompanyReport] = useState(false);
   const [clickedIndex, setClickedIndex] = useState(null);
 
   const navigate = useNavigate();
@@ -44,6 +41,8 @@ export default function ProjectCompanies() {
   // Determine current view from URL
   const isSummary = location.pathname.includes("/summary");
   const isReport = location.pathname.includes("/report");
+  const isPhases = location.pathname.includes("/phases");
+  const isAudit = !isSummary && !isReport && !isPhases;
 
   // ✅ Countdown Timer Logic
   const [secondsLeft, setSecondsLeft] = useState(24 * 60 * 60 - 60);
@@ -140,17 +139,13 @@ export default function ProjectCompanies() {
     },
   ];
 
-
-
-
-
   return (
     <div className="h-screen bg-[#f5f6f7] flex flex-col relative overflow-hidden">
       <ProjectHeader
         isReport={isReport}
         isSummary={isSummary}
-        submitted={submitted}
-        setSubmitted={setSubmitted}
+        isPhases={isPhases}
+        isAudit={isAudit}
         selectedCompany={selectedCompany}
         selectedAudit={selectedAudit}
         setShowAttentionModal={setShowAttentionModal}
@@ -165,19 +160,21 @@ export default function ProjectCompanies() {
             companies={companies}
           />
         } />
-        <Route path="/" element={
+        <Route path="/*" element={
           <div className="flex flex-1">
             <CompanySelection
               companies={companies}
               selectedCompany={selectedCompany}
               setSelectedCompany={setSelectedCompany}
               setSelectedAudit={setSelectedAudit}
-              setSubmitted={setSubmitted}
+              selectedAudit={selectedAudit}
+              checkedServices={checkedServices}
+              services={services}
             />
             <div className="w-1/2 flex flex-col bg-white">
               <div className="h-12 flex items-center justify-between px-6 border-b border-gray-200 bg-[#f9fafb]">
                 <p className="text-sm font-medium text-gray-700">
-                  {submitted ? `Add project phases to ${selectedCompany}` : "Phases selected by the supplier"}
+                  {isPhases ? `Add project phases to ${selectedCompany}` : "Phases selected by the supplier"}
                 </p>
                 <FileSearch size={16} className="text-gray-500" />
               </div>
@@ -186,20 +183,25 @@ export default function ProjectCompanies() {
                 <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
                   Select a company
                 </div>
-              ) : !submitted ? (
-                <AuditGrid
-                  audits={audits}
-                  selectedAudit={selectedAudit}
-                  setSelectedAudit={setSelectedAudit}
-                />
               ) : (
-                <ServiceGrid
-                  services={services}
-                  checkedServices={checkedServices}
-                  setCheckedServices={setCheckedServices}
-                  setActiveServiceIndex={setActiveServiceIndex}
-                  setShowModal={setShowModal}
-                />
+                <Routes>
+                  <Route path="phases" element={
+                    <ServiceGrid
+                      services={services}
+                      checkedServices={checkedServices}
+                      setCheckedServices={setCheckedServices}
+                      setActiveServiceIndex={setActiveServiceIndex}
+                      setShowModal={setShowModal}
+                    />
+                  } />
+                  <Route path="/" element={
+                    <AuditGrid
+                      audits={audits}
+                      selectedAudit={selectedAudit}
+                      setSelectedAudit={setSelectedAudit}
+                    />
+                  } />
+                </Routes>
               )}
             </div>
           </div>
@@ -208,7 +210,6 @@ export default function ProjectCompanies() {
 
       {showModal && (
         <CopyModal
-          setSubmitted={setSubmitted}
           setShowAttentionModal={setShowAttentionModal}
           setShowModal={setShowModal}
         />
