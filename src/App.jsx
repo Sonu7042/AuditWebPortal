@@ -16,8 +16,10 @@ import NonConformitiesPage from "./component/NonConformitiesPage.jsx";
 import CreateNonConformity from "./component/CreateNonConformity.jsx";
 import PendingNonCompliance from "./component/PendingNonCompliance.jsx";
 import CloseNonComplianceReport from "./component/CloseNonComplianceReport.jsx";
+import CloseNonComplianceRecurring from "./component/CloseNonComplianceRecurring.jsx"; 
 import AuditChecklist from "./component/AuditChecklist.jsx";
 import WorkPage from "./component/WorkPage.jsx";
+import WorkPageRecurring from "./component/workPageRecurring.jsx";
 
 function App() {
   return (
@@ -32,10 +34,12 @@ function App() {
           <Route path="/projecCompanies" element={<ProjectCompanies />} />
           <Route path="/pendingNonCompliance" element={<PendingNonCompliance />} />
           <Route path="/close-nc/:id" element={<CloseNonComplianceReport />} />
+          <Route path="/close-nc-recurring/:id" element={<CloseNonComplianceRecurring />} />
 
           {/* 🔥 Audit Routes */}
           <Route path="/audit-checklist" element={<AuditChecklist />} />
           <Route path="/work/:sectionId/:questionId/:status" element={<WorkPage />} />
+          <Route path="/work-recurring/:sectionId/:questionId/:status" element={<WorkPageRecurring />} />
           <Route path="/ProductSync" element={<SynchronisationPage />} />
           <Route path="/machine" element={<MachineryPage />} />
           <Route path="/workers" element={<WorkersPage />} />
