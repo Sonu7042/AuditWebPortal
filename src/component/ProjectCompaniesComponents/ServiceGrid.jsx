@@ -17,7 +17,7 @@ export default function ServiceGrid({ services, checkedServices, setCheckedServi
                                 }
                             }
                         }}
-                        className="relative bg-white rounded-xl shadow-md p-8 text-center cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
+                        className="relative bg-white rounded-xl shadow-sm p-8 text-center cursor-pointer transition-all duration-300  "
                     >
                         {checkedServices.includes(index) && (
                             <div className="absolute top-4 left-4 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">
