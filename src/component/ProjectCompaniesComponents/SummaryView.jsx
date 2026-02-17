@@ -16,12 +16,12 @@ export default function SummaryView({ companies }) {
                 </div>
                 <div className="flex items-center gap-4">
                     <p className="text-xs text-gray-600 font-medium tracking-tight">Companies in the report</p>
-                    <button
+                    {/* <button
                         onClick={() => navigate("/projecCompanies", { replace: true })}
                         className="px-4 py-1.5 text-xs border border-gray-300 text-gray-700 rounded-md font-bold uppercase hover:bg-gray-50 transition-colors"
                     >
                         Change companies
-                    </button>
+                    </button> */}
                     <HelpCircle size={18} className="text-gray-400" />
                 </div>
             </div>

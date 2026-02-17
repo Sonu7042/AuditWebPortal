@@ -12,7 +12,7 @@ export default function CompanyReportView({ reportSections }) {
       {/* Top Section Same */}
       <div className="bg-white border-b border-gray-200 divide-y divide-gray-100">
         <div className="flex h-14 items-center">
-          <div className="w-[200px] h-full flex items-center px-6 gap-3 bg-gray-50/50 border-r border-gray-200">
+          <div className="w-50 h-full flex items-center px-6 gap-3 bg-gray-50/50 border-r border-gray-200">
             <FileText size={18} className="text-gray-400" />
             <p className="text-[10px] text-gray-500 font-bold uppercase leading-tight">
               Technical description of the report
@@ -21,7 +21,7 @@ export default function CompanyReportView({ reportSections }) {
           <div className="flex-1 px-6"></div>
         </div>
         <div className="flex h-14 items-center">
-          <div className="w-[200px] h-full flex items-center px-6 gap-3 bg-gray-50/50 border-r border-gray-200">
+          <div className="w-50 h-full flex items-center px-6 gap-3 bg-gray-50/50 border-r border-gray-200">
             <MessageSquare size={18} className="text-gray-400" />
             <p className="text-[10px] text-gray-500 font-bold uppercase leading-tight">
               Observations
@@ -82,7 +82,7 @@ export default function CompanyReportView({ reportSections }) {
           {sec.icon}
         </div>
 
-        <h3 className="text-[11px] font-bold text-gray-600 text-center uppercase tracking-tight leading-relaxed max-w-[120px]">
+        <h3 className="text-[11px] font-bold text-gray-600 text-center uppercase tracking-tight leading-relaxed max-w-30">
           {sec.title}
         </h3>
       </Link>

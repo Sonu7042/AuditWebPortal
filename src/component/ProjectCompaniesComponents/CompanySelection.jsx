@@ -16,21 +16,32 @@ export default function CompanySelection({ companies, selectedCompany, setSelect
             {companies.map((company, index) => (
                 <React.Fragment key={index}>
                     <div
-                        onClick={() => {
+                        onClick={selectedAudit ? null : () => {
                             setSelectedCompany(company);
                             setSelectedAudit(null);
                             navigate("/projecCompanies", { replace: true });
                         }}
-                        className={`px-6 py-4 border-b border-gray-200 cursor-pointer ${selectedCompany === company
-                            ? "bg-blue-50 font-medium"
-                            : "hover:bg-gray-50"
+                        className={`px-6 py-4 border-b border-gray-200 transition-all ${selectedCompany === company
+                                ? "bg-blue-50 font-medium cursor-default"
+                                : selectedAudit
+                                    ? "opacity-40 cursor-not-allowed select-none"
+                                    : "hover:bg-gray-50 cursor-pointer"
                             }`}
                     >
                         {company}
                     </div>
                     {selectedCompany === company && (
-                        <div className="px-8 py-4 bg-gray-50/50 border-b border-gray-200">
-                            {checkedServices && checkedServices.length > 0 ? (
+                        <div className="px-8 py-4 bg-gray-50/50 border-b border-gray-200 space-y-4">
+                            {selectedAudit && (
+                                <div className="space-y-1">
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Selected Audit</p>
+                                    <p className="text-[11px] text-gray-600 font-medium lowercase first-letter:uppercase">
+                                        ● {selectedAudit}
+                                    </p>
+                                </div>
+                            )}
+
+                            {checkedServices && checkedServices.length > 0 && (
                                 <div className="space-y-1.5">
                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Project Phases</p>
                                     <div className="flex flex-wrap gap-1">
@@ -41,15 +52,6 @@ export default function CompanySelection({ companies, selectedCompany, setSelect
                                         ))}
                                     </div>
                                 </div>
-                            ) : (
-                                selectedAudit && (
-                                    <div className="space-y-1">
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Selected Audit</p>
-                                        <p className="text-[11px] text-gray-600 font-medium lowercase first-letter:uppercase">
-                                            ● {selectedAudit}
-                                        </p>
-                                    </div>
-                                )
                             )}
                         </div>
                     )}
