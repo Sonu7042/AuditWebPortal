@@ -10,14 +10,15 @@ import {
 } from "lucide-react";
 
 export default function VisitSheet() {
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  // 🔥 Open Real Camera
+  // 🔥 Open Camera
   const handleTakePhoto = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -33,11 +34,11 @@ export default function VisitSheet() {
         }
       }, 100);
     } catch (err) {
-      alert("Camera permission denied or not supported.");
+      alert("Camera not supported or permission denied.");
     }
   };
 
-  // 📸 Capture Photo
+  // 📸 Capture from Camera
   const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -49,7 +50,8 @@ export default function VisitSheet() {
     ctx.drawImage(video, 0, 0);
 
     const photoData = canvas.toDataURL("image/png");
-    setImage(photoData);
+
+    setImages((prev) => [...prev, photoData]);
 
     closeCamera();
   };
@@ -62,13 +64,42 @@ export default function VisitSheet() {
     setIsCameraOpen(false);
   };
 
+  // 📂 Open File Picker
+  const handleLibraryClick = () => {
+    fileInputRef.current.click();
+  };
+
+  // 📂 Handle Multiple File Selection
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    const newImages = files.map((file) => URL.createObjectURL(file));
+
+    setImages((prev) => [...prev, ...newImages]);
+  };
+
+
+  // ❌ Delete Image
+const handleDeleteImage = (indexToDelete) => {
+  setImages((prev) => prev.filter((_, index) => index !== indexToDelete));
+};
+
   return (
     <div className="h-screen w-screen bg-white flex flex-col relative">
 
-      {/* 🔥 FULL SCREEN CAMERA OVERLAY */}
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
+      {/* Camera Overlay */}
       {isCameraOpen && (
         <div className="absolute inset-0 bg-black z-50">
-
           <video
             ref={videoRef}
             autoPlay
@@ -76,7 +107,6 @@ export default function VisitSheet() {
             className="h-full w-full object-cover"
           />
 
-          {/* Capture Button */}
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
             <button
               onClick={capturePhoto}
@@ -84,7 +114,6 @@ export default function VisitSheet() {
             />
           </div>
 
-          {/* Close Button */}
           <button
             onClick={closeCamera}
             className="absolute top-6 right-6 bg-white p-2 rounded-full"
@@ -110,7 +139,7 @@ export default function VisitSheet() {
         </button>
       </div>
 
-      {/* Top Info Section */}
+        {/* Top Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 border-b px-6 py-4 text-sm">
         <div>
           <p className="text-gray-500">Visit</p>
@@ -141,6 +170,7 @@ export default function VisitSheet() {
         </div>
       </div>
 
+
       {/* Info Banner */}
       <div className="flex items-center justify-between px-6 py-2 bg-gray-50 border-b">
         <p className="text-sm text-gray-600">
@@ -154,17 +184,35 @@ export default function VisitSheet() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex overflow-hidden">
 
-        {/* LEFT SIDE IMAGE */}
-        {image ? (
-          <div className="w-full md:w-1/3 border-r p-4 flex justify-center items-start">
-            <img
-              src={image}
-              alt="Visit"
-              className="rounded-lg object-cover max-h-[80vh]"
-            />
-          </div>
+        {/* LEFT SIDE MULTIPLE IMAGES */}
+        {images.length > 0 ? (
+         <div className="w-full  border-r p-4 overflow-y-auto">
+  <div className="flex flex-wrap gap-4">
+    {images.map((img, index) => (
+      <div
+        key={index}
+        className="relative w-[140px] h-[140px]"
+      >
+        <img
+          src={img}
+          alt="Visit"
+          className="w-full h-full object-cover rounded-lg"
+        />
+
+        {/* Delete Icon */}
+        <button
+          onClick={() => handleDeleteImage(index)}
+          className="absolute bottom-2 right-2 bg-black/70 p-1 rounded-full text-white hover:bg-red-600"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
             <div className="w-16 h-16 flex items-center justify-center border rounded-md mb-4">
@@ -185,12 +233,7 @@ export default function VisitSheet() {
           </div>
         )}
 
-        {/* RIGHT SIDE */}
-        {image && (
-          <div className="hidden md:flex flex-1 items-center justify-center text-gray-400">
-            Future details section
-          </div>
-        )}
+      
       </div>
 
       {/* Bottom Buttons */}
@@ -204,7 +247,7 @@ export default function VisitSheet() {
         </button>
 
         <button
-          onClick={handleTakePhoto}
+          onClick={handleLibraryClick}
           className="flex items-center justify-center gap-2 py-4 hover:bg-gray-50 text-sm font-medium"
         >
           <ImagePlus className="w-5 h-5" />
