@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import {
   Wrench,
   Hammer,
@@ -37,6 +38,13 @@ export default function ProjectCompanies() {
   const [showCompanyReport, setShowCompanyReport] = useState(false);
   const [clickedIndex, setClickedIndex] = useState(null);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Determine current view from URL
+  const isSummary = location.pathname.includes("/summary");
+  const isReport = location.pathname.includes("/report");
+
   // ✅ Countdown Timer Logic
   const [secondsLeft, setSecondsLeft] = useState(24 * 60 * 60 - 60);
 
@@ -68,12 +76,18 @@ export default function ProjectCompanies() {
   ];
 
   const audits = [
-    "SAFETY AUDIT",
-    "ELECTRICAL AUDIT",
+    "SAFETY AUDIT(IS 14489)",
+    "ELETRICAL AUDIT",
     "FIRE SAFETY AUDIT",
     "EHS AUDIT",
+    "WEEKLY GEMBA WALK",
     "ENERGY AUDIT",
     "QUALITY AUDIT",
+    "LEGAL COMPLIANCE AUDIT",
+    "OISD AUDIT",
+    "ISO INTERNAL AUDIT (ISO 9001, ISO 14001, & ISO 45001)",
+    "ISO GAP ANALYSIS (ISO 9001, ISO 14001, & ISO 45001)",
+    "MACHINE AUDIT (ISO 12100)",
   ];
 
   const services = [
@@ -87,56 +101,54 @@ export default function ProjectCompanies() {
     { title: "Painting & Finishes", icon: <Paintbrush size={28} /> },
   ];
 
-const reportSections = [
-  { 
-    title: "PREVENTIVE MANAGEMENT", 
-    icon: <ShieldCheck size={40} />, 
-    badge: "1",
-    link: "/pendingNonCompliance"
-  },
-  { 
-    title: "PREVENTIVE PLAN", 
-    icon: <ClipboardCheck size={40} />,
-    link: "#"
-  },
-  { 
-    title: "WORKERS", 
-    icon: <Users size={40} />,
-    link: "/workers"
-  },
-  { 
-    title: "MACHINERY", 
-    icon: <Settings size={40} />,
-    link: "/machine"
-  },
-  { 
-    title: "ANCILLARY MEASURES", 
-    icon: <Package size={40} />,
-    link: "/ancillary"
-  },
-  { 
-    title: "CHEMICAL PRODUCTS", 
-    icon: <FlaskConical size={40} />,
-    link: "/chemicalProducts"
-  },
-  { 
-    title: "VISIT SHEET", 
-    icon: <FileSearch size={40} />,
-    link: "#"
-  },
-];
+  const reportSections = [
+    {
+      title: "PREVENTIVE MANAGEMENT",
+      icon: <ShieldCheck size={40} />,
+      badge: "1",
+      link: "/pendingNonCompliance"
+    },
+    {
+      title: "PREVENTIVE PLAN",
+      icon: <ClipboardCheck size={40} />,
+      link: "#"
+    },
+    {
+      title: "WORKERS",
+      icon: <Users size={40} />,
+      link: "/workers"
+    },
+    {
+      title: "MACHINERY",
+      icon: <Settings size={40} />,
+      link: "/machine"
+    },
+    {
+      title: "ANCILLARY MEASURES",
+      icon: <Package size={40} />,
+      link: "/ancillary"
+    },
+    {
+      title: "CHEMICAL PRODUCTS",
+      icon: <FlaskConical size={40} />,
+      link: "/chemicalProducts"
+    },
+    {
+      title: "VISIT SHEET",
+      icon: <FileSearch size={40} />,
+      link: "#"
+    },
+  ];
 
 
 
-  
+
 
   return (
     <div className="h-screen bg-[#f5f6f7] flex flex-col relative overflow-hidden">
       <ProjectHeader
-        showCompanyReport={showCompanyReport}
-        setShowCompanyReport={setShowCompanyReport}
-        showSummary={showSummary}
-        setShowSummary={setShowSummary}
+        isReport={isReport}
+        isSummary={isSummary}
         submitted={submitted}
         setSubmitted={setSubmitted}
         selectedCompany={selectedCompany}
@@ -146,58 +158,57 @@ const reportSections = [
 
       <TopInfoBar />
 
-      {showCompanyReport ? (
-        <CompanyReportView reportSections={reportSections} />
-      ) : showSummary ? (
-        <SummaryView
-          companies={companies}
-          setShowSummary={setShowSummary}
-          setShowCompanyReport={setShowCompanyReport}
-        />
-      ) : (
-        <div className="flex flex-1">
-          <CompanySelection
+      <Routes>
+        <Route path="report" element={<CompanyReportView reportSections={reportSections} />} />
+        <Route path="summary" element={
+          <SummaryView
             companies={companies}
-            selectedCompany={selectedCompany}
-            setSelectedCompany={setSelectedCompany}
-            setSelectedAudit={setSelectedAudit}
-            setSubmitted={setSubmitted}
           />
-          <div className="w-1/2 flex flex-col bg-white">
-            <div className="h-12 flex items-center justify-between px-6 border-b border-gray-200 bg-[#f9fafb]">
-              <p className="text-sm font-medium text-gray-700">
-                {submitted ? `Add project phases to ${selectedCompany}` : "Phases selected by the supplier"}
-              </p>
-              <FileSearch size={16} className="text-gray-500" />
-            </div>
-
-            {!selectedCompany ? (
-              <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
-                Select a company
+        } />
+        <Route path="/" element={
+          <div className="flex flex-1">
+            <CompanySelection
+              companies={companies}
+              selectedCompany={selectedCompany}
+              setSelectedCompany={setSelectedCompany}
+              setSelectedAudit={setSelectedAudit}
+              setSubmitted={setSubmitted}
+            />
+            <div className="w-1/2 flex flex-col bg-white">
+              <div className="h-12 flex items-center justify-between px-6 border-b border-gray-200 bg-[#f9fafb]">
+                <p className="text-sm font-medium text-gray-700">
+                  {submitted ? `Add project phases to ${selectedCompany}` : "Phases selected by the supplier"}
+                </p>
+                <FileSearch size={16} className="text-gray-500" />
               </div>
-            ) : !submitted ? (
-              <AuditGrid
-                audits={audits}
-                selectedAudit={selectedAudit}
-                setSelectedAudit={setSelectedAudit}
-              />
-            ) : (
-              <ServiceGrid
-                services={services}
-                checkedServices={checkedServices}
-                setCheckedServices={setCheckedServices}
-                setActiveServiceIndex={setActiveServiceIndex}
-                setShowModal={setShowModal}
-              />
-            )}
+
+              {!selectedCompany ? (
+                <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
+                  Select a company
+                </div>
+              ) : !submitted ? (
+                <AuditGrid
+                  audits={audits}
+                  selectedAudit={selectedAudit}
+                  setSelectedAudit={setSelectedAudit}
+                />
+              ) : (
+                <ServiceGrid
+                  services={services}
+                  checkedServices={checkedServices}
+                  setCheckedServices={setCheckedServices}
+                  setActiveServiceIndex={setActiveServiceIndex}
+                  setShowModal={setShowModal}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        } />
+      </Routes>
 
       {showModal && (
         <CopyModal
           setSubmitted={setSubmitted}
-          setShowSummary={setShowSummary}
           setShowAttentionModal={setShowAttentionModal}
           setShowModal={setShowModal}
         />
