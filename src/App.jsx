@@ -39,8 +39,8 @@ function App() {
 
           {/* 🔥 Audit Routes */}
           <Route path="/audit-checklist" element={<AuditChecklist />} />
-          <Route path="/work/:sectionId/:questionId/:status" element={<WorkPage />} />
-          <Route path="/work-recurring/:sectionId/:questionId/:status" element={<WorkPageRecurring />} />
+          <Route path="/work/:sectionId/:subId/:questionId/:status" element={<WorkPage />} />
+          <Route path="/work-recurring/:sectionId/:subId/:questionId/:status" element={<WorkPageRecurring />} />
           <Route path="/ProductSync" element={<SynchronisationPage />} />
           <Route path="/machine" element={<MachineryPage />} />
           <Route path="/workers" element={<WorkersPage />} />
