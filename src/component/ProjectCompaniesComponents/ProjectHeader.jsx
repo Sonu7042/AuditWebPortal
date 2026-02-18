@@ -16,10 +16,10 @@ export default function ProjectHeader({
     return (
         <div className="h-14 flex items-center justify-between px-6 border-b border-gray-300 bg-[#f5f6f7]">
             <ArrowLeft className="text-gray-600 cursor-pointer" size={20} onClick={() => {
-                if (isReport) navigate("/dashboard", { replace: true });
-                else if (isSummary) navigate("/dashboard", { replace: true });
-                else if (isPhases) navigate("/dashboard", { replace: true });
-                else navigate("/dashboard");
+                if (isReport) navigate("/projecCompanies/summary", { replace: true });
+                else if (isSummary) navigate("/projecCompanies/summary", { replace: true });
+                else if (isPhases) navigate("/projecCompanies/summary", { replace: true });
+                else navigate("/projecCompanies/summary");
             }} />
             <h1 className="text-sm tracking-widest font-medium text-gray-700">
                 {isReport ? `Company report: ${selectedCompany}` : "TECHNICAL PROJECT REPORT"}
