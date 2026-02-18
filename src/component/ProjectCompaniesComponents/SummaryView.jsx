@@ -29,7 +29,7 @@ export default function SummaryView({ companies }) {
             {/* Company Cards List */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
                 {companies.map((company, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-10 shadow-sm flex items-center justify-between">
+                    <button  onClick={() => navigate("/projecCompanies/report", { replace: true })} key={index} className="bg-white border border-gray-200 rounded-lg p-10 shadow-sm flex items-center justify-between">
                         <div className="flex items-center gap-6">
                             <div className={`p-2 rounded-full ${index === 0 ? "bg-amber-500 text-white" : "text-gray-300"}`}>
                                 <AlertTriangle size={36} />
@@ -45,7 +45,7 @@ export default function SummaryView({ companies }) {
                         </div>
                         <button
                             disabled={index !== 0}
-                            onClick={() => navigate("/projecCompanies/report", { replace: true })}
+                            onClick={() => navigate("/projecCompanies/report")}
                             className={`px-10 py-3 rounded-md font-bold text-xs uppercase border transition-all ${index === 0
                                 ? "border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white"
                                 : "border-gray-200 text-gray-200 cursor-not-allowed"
@@ -53,7 +53,7 @@ export default function SummaryView({ companies }) {
                         >
                             Complete
                         </button>
-                    </div>
+                    </button>
                 ))}
             </div>
 

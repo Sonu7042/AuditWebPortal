@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   ArrowLeft,
   Home,
@@ -18,7 +18,35 @@ export default function VisitSheet() {
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // 🔥 Open Camera
+  // ✅ LOAD IMAGES FROM LOCALSTORAGE ON MOUNT
+  useEffect(() => {
+    const existingData =
+      JSON.parse(localStorage.getItem("reportData")) || {};
+
+    if (existingData.visitImg) {
+      setImages(existingData.visitImg);
+    }
+  }, []);
+
+  // ✅ SAVE INTO reportData (KEY = visitImg)
+  const saveVisitImages = (imageArray) => {
+    const existingData =
+      JSON.parse(localStorage.getItem("reportData")) || {};
+
+    const updatedData = {
+      ...existingData,
+      visitImg: imageArray,
+    };
+
+    localStorage.setItem("reportData", JSON.stringify(updatedData));
+  };
+
+  // 🔄 AUTO SAVE WHEN IMAGES CHANGE
+  useEffect(() => {
+    saveVisitImages(images);
+  }, [images]);
+
+  // 📷 OPEN CAMERA
   const handleTakePhoto = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -38,7 +66,7 @@ export default function VisitSheet() {
     }
   };
 
-  // 📸 Capture from Camera
+  // 📸 CAPTURE PHOTO (BASE64)
   const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -49,14 +77,13 @@ export default function VisitSheet() {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0);
 
-    const photoData = canvas.toDataURL("image/png");
+    const photoData = canvas.toDataURL("image/jpeg", 0.8);
 
     setImages((prev) => [...prev, photoData]);
-
     closeCamera();
   };
 
-  // ❌ Close Camera
+  // ❌ CLOSE CAMERA
   const closeCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -64,28 +91,33 @@ export default function VisitSheet() {
     setIsCameraOpen(false);
   };
 
-  // 📂 Open File Picker
+  // 📂 OPEN FILE PICKER
   const handleLibraryClick = () => {
     fileInputRef.current.click();
   };
 
-  // 📂 Handle Multiple File Selection
+  // 📂 CONVERT FILES TO BASE64 (PERMANENT)
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
 
-    const newImages = files.map((file) => URL.createObjectURL(file));
-
-    setImages((prev) => [...prev, ...newImages]);
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImages((prev) => [...prev, reader.result]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
-
-  // ❌ Delete Image
-const handleDeleteImage = (indexToDelete) => {
-  setImages((prev) => prev.filter((_, index) => index !== indexToDelete));
-};
+  // ❌ DELETE IMAGE
+  const handleDeleteImage = (indexToDelete) => {
+    setImages((prev) =>
+      prev.filter((_, index) => index !== indexToDelete)
+    );
+  };
 
   return (
-    <div className="h-screen w-screen bg-white flex flex-col relative">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
 
       {/* Hidden File Input */}
       <input
@@ -99,12 +131,12 @@ const handleDeleteImage = (indexToDelete) => {
 
       {/* Camera Overlay */}
       {isCameraOpen && (
-        <div className="absolute inset-0 bg-black z-50">
+        <div className="fixed inset-0 bg-black z-50">
           <video
             ref={videoRef}
             autoPlay
             playsInline
-            className="h-full w-full object-cover"
+            className="w-full h-full object-cover"
           />
 
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
@@ -125,8 +157,8 @@ const handleDeleteImage = (indexToDelete) => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between border-b px-6 py-3">
+      {/* HEADER */}
+      <div className="flex items-center justify-between bg-white border-b px-6 py-4 shadow-sm">
         <div className="flex items-center gap-3">
           <ArrowLeft className="w-5 h-5 cursor-pointer" />
           <h1 className="text-lg font-semibold tracking-wide">
@@ -134,12 +166,13 @@ const handleDeleteImage = (indexToDelete) => {
           </h1>
         </div>
 
-        <button className="border px-4 py-1.5 rounded-md text-sm font-medium hover:bg-gray-100">
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition">
           Complete Report
         </button>
       </div>
 
-        {/* Top Info Section */}
+
+         {/* Top Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 border-b px-6 py-4 text-sm">
         <div>
           <p className="text-gray-500">Visit</p>
@@ -183,75 +216,53 @@ const handleDeleteImage = (indexToDelete) => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
-
-        {/* LEFT SIDE MULTIPLE IMAGES */}
+      {/* MAIN CONTENT */}
+      <div className="flex-1 p-6 overflow-y-auto">
         {images.length > 0 ? (
-         <div className="w-full  border-r p-4 overflow-y-auto">
-  <div className="flex flex-wrap gap-4">
-    {images.map((img, index) => (
-      <div
-        key={index}
-        className="relative w-[140px] h-[140px]"
-      >
-        <img
-          src={img}
-          alt="Visit"
-          className="w-full h-full object-cover rounded-lg"
-        />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {images.map((img, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={img}
+                  alt="Visit"
+                  className="w-full h-40 object-cover rounded-lg shadow"
+                />
 
-        {/* Delete Icon */}
-        <button
-          onClick={() => handleDeleteImage(index)}
-          className="absolute bottom-2 right-2 bg-black/70 p-1 rounded-full text-white hover:bg-red-600"
-        >
-          <X size={16} />
-        </button>
-      </div>
-    ))}
-  </div>
-</div>
-
+                <button
+                  onClick={() => handleDeleteImage(index)}
+                  className="absolute top-2 right-2 bg-black/70 p-1 rounded-full text-white hover:bg-red-600"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
-            <div className="w-16 h-16 flex items-center justify-center border rounded-md mb-4">
-              📄
-            </div>
-
-            <p className="text-gray-600 text-sm">
-              THERE ARE NO MANAGEMENT VISIT SHEETS FOR THE COMPANY:
-            </p>
-
-            <p className="text-gray-800 font-semibold text-sm mt-1">
-              INDERJEET BROS PROJECTS PVT. LTD.
-            </p>
-
-            <p className="text-gray-500 text-sm mt-2">
+          <div className="h-full flex flex-col items-center justify-center text-center text-gray-500">
+            <div className="text-5xl mb-4">📄</div>
+            <p className="text-sm">
               Add at least one photo as visit sheet
             </p>
           </div>
         )}
-
-      
       </div>
 
-      {/* Bottom Buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 border-t">
+      {/* BOTTOM ACTIONS */}
+      <div className="grid grid-cols-2 bg-white border-t">
         <button
           onClick={handleTakePhoto}
-          className="flex items-center justify-center gap-2 py-4 hover:bg-gray-50 border-r text-sm font-medium"
+          className="flex items-center justify-center gap-2 py-4 hover:bg-gray-50 border-r"
         >
-          <Camera className="w-5 h-5" />
-          Take a photo of the visit sheet
+          <Camera size={18} />
+          Take Photo
         </button>
 
         <button
           onClick={handleLibraryClick}
-          className="flex items-center justify-center gap-2 py-4 hover:bg-gray-50 text-sm font-medium"
+          className="flex items-center justify-center gap-2 py-4 hover:bg-gray-50"
         >
-          <ImagePlus className="w-5 h-5" />
-          Add a photo from the library
+          <ImagePlus size={18} />
+          Add From Library
         </button>
       </div>
     </div>

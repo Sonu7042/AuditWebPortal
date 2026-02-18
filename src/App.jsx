@@ -27,7 +27,7 @@ function App() {
     <AppProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Login />} />  
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/ListofProject" element={<ListofProject />} />
           <Route path="/projectReports" element={<ProjectReports />} />
@@ -44,7 +44,7 @@ function App() {
           <Route path="/ProductSync" element={<SynchronisationPage />} />
           <Route path="/machine" element={<MachineryPage />} />
           <Route path="/workers" element={<WorkersPage />} />
-          <Route path="/ancillary" element={<AncilaryMeasurePage />} />
+          {/* <Route path="/ancillary" element={<AncilaryMeasurePage />} /> */}
           <Route path="/chemicalProducts" element={<ChemicalProducts />} />
           <Route path="/nonConformities" element={<NonConformitiesPage />} />
           <Route path="/createNonConformity" element={<CreateNonConformity />} />

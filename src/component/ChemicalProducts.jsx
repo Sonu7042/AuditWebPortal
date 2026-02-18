@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function ChemicalProducts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [selectedMachinery, setSelectedMachinery] = useState([]);
+  const [selectedChemicals, setSelectedChemicals] = useState([]);
 
-  const machineryList = [
+  const chemicalList = [
     "Electronic Texture Sprayer RTX-2500PC Graco",
     "Hand Cutter Machine GSC-140 Bosch",
     "Hand Drill Machine GSB-10RE Bosch",
@@ -25,17 +25,37 @@ export default function ChemicalProducts() {
     "Pipe Cutter Machine DW871 Dewalt",
   ];
 
-  const filteredList = machineryList.filter((item) =>
+  const filteredList = chemicalList.filter((item) =>
     item.toLowerCase().includes(search.toLowerCase())
   );
 
-  const toggleMachinery = (item) => {
-    if (selectedMachinery.includes(item)) {
-      setSelectedMachinery(selectedMachinery.filter((m) => m !== item));
+  const toggleChemical = (item) => {
+    if (selectedChemicals.includes(item)) {
+      setSelectedChemicals(
+        selectedChemicals.filter((c) => c !== item)
+      );
     } else {
-      setSelectedMachinery([...selectedMachinery, item]);
+      setSelectedChemicals([...selectedChemicals, item]);
     }
   };
+
+  // 🔥 SAVE / MERGE INTO reportData (KEY = chemicals)
+  const saveChemicalData = (chemicalsArray) => {
+    const existingData =
+      JSON.parse(localStorage.getItem("reportData")) || {};
+
+    const updatedData = {
+      ...existingData,
+      chemicals: chemicalsArray,
+    };
+
+    localStorage.setItem("reportData", JSON.stringify(updatedData));
+  };
+
+  // 🔥 AUTO SAVE WHEN SELECTION CHANGES
+  useEffect(() => {
+    saveChemicalData(selectedChemicals);
+  }, [selectedChemicals]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-6">
@@ -76,21 +96,16 @@ export default function ChemicalProducts() {
         </div>
       </div>
 
-      {/* Machinery Grid */}
-      <div className="grid gap-6 
-                      grid-cols-1 
-                      sm:grid-cols-2 
-                      md:grid-cols-3 
-                      lg:grid-cols-4">
-
+      {/* Chemical Grid */}
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {filteredList.length > 0 ? (
           filteredList.map((item, index) => {
-            const isSelected = selectedMachinery.includes(item);
+            const isSelected = selectedChemicals.includes(item);
 
             return (
               <div
                 key={index}
-                onClick={() => toggleMachinery(item)}
+                onClick={() => toggleChemical(item)}
                 className={`rounded-xl p-6 relative shadow-sm hover:shadow-lg transition duration-300 min-h-[160px] flex flex-col justify-between cursor-pointer
                   ${
                     isSelected
@@ -120,7 +135,7 @@ export default function ChemicalProducts() {
           })
         ) : (
           <div className="col-span-full text-center text-gray-400 py-10">
-            No machinery found
+            No chemical products found
           </div>
         )}
       </div>

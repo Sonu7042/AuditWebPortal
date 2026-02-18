@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -31,19 +31,37 @@ export default function WorkersPage() {
 
   const toggleMachinery = (item) => {
     if (selectedMachinery.includes(item)) {
-      setSelectedMachinery(selectedMachinery.filter((m) => m !== item));
+      setSelectedMachinery(
+        selectedMachinery.filter((m) => m !== item)
+      );
     } else {
       setSelectedMachinery([...selectedMachinery, item]);
     }
   };
 
+  // 🔥 SAVE / MERGE INTO reportData (KEY = workers)
+  const saveWorkersData = (workersArray) => {
+    const existingData =
+      JSON.parse(localStorage.getItem("reportData")) || {};
+
+    const updatedData = {
+      ...existingData,
+      workers: workersArray,
+    };
+
+    localStorage.setItem("reportData", JSON.stringify(updatedData));
+  };
+
+  // 🔥 AUTO SAVE WHEN SELECTION CHANGES
+  useEffect(() => {
+    saveWorkersData(selectedMachinery);
+  }, [selectedMachinery]);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-6">
-      
       {/* Header */}
       <div className="bg-white shadow rounded-lg p-4 mb-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          
           <div>
             <h1 className="text-xl font-semibold text-gray-700">
               Workers
@@ -54,7 +72,6 @@ export default function WorkersPage() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
-            
             <div className="relative w-full md:w-72">
               <input
                 type="text"
@@ -71,58 +88,46 @@ export default function WorkersPage() {
             >
               <Home size={20} className="text-gray-600" />
             </button>
-
           </div>
         </div>
       </div>
 
       {/* Machinery Grid */}
-      <div className="grid gap-6 
-                      grid-cols-1 
-                      sm:grid-cols-2 
-                      md:grid-cols-3 
-                      lg:grid-cols-4">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {filteredList.map((item, index) => {
+          const isSelected = selectedMachinery.includes(item);
 
-        {filteredList.length > 0 ? (
-          filteredList.map((item, index) => {
-            const isSelected = selectedMachinery.includes(item);
+          return (
+            <div
+              key={index}
+              onClick={() => toggleMachinery(item)}
+              className={`rounded-xl p-6 relative shadow-sm hover:shadow-lg transition duration-300 min-h-[160px] flex flex-col justify-between cursor-pointer
+                ${
+                  isSelected
+                    ? "bg-green-50 border border-green-200"
+                    : "bg-white border border-gray-200"
+                }`}
+            >
+              {isSelected && (
+                <div className="absolute top-4 right-4 text-green-600">
+                  <Check size={22} />
+                </div>
+              )}
 
-            return (
-              <div
-                key={index}
-                onClick={() => toggleMachinery(item)}
-                className={`rounded-xl p-6 relative shadow-sm hover:shadow-lg transition duration-300 min-h-[160px] flex flex-col justify-between cursor-pointer
-                  ${
-                    isSelected
-                      ? "bg-green-50 border border-green-200"
-                      : "bg-white border border-gray-200"
-                  }`}
+              <h3 className="text-sm font-semibold text-gray-700 leading-tight">
+                {item}
+              </h3>
+
+              <p
+                className={`text-sm font-semibold mt-4 ${
+                  isSelected ? "text-green-600" : "text-gray-400"
+                }`}
               >
-                {isSelected && (
-                  <div className="absolute top-4 right-4 text-green-600">
-                    <Check size={22} />
-                  </div>
-                )}
-
-                <h3 className="text-sm font-semibold text-gray-700 leading-tight">
-                  {item}
-                </h3>
-
-                <p
-                  className={`text-sm font-semibold mt-4 ${
-                    isSelected ? "text-green-600" : "text-gray-400"
-                  }`}
-                >
-                  {isSelected ? "VALID" : "NOT CHECKED"}
-                </p>
-              </div>
-            );
-          })
-        ) : (
-          <div className="col-span-full text-center text-gray-400 py-10">
-            No machinery found
-          </div>
-        )}
+                {isSelected ? "VALID" : "NOT CHECKED"}
+              </p>
+            </div>
+          );
+        })}
       </div>
 
       {/* Bottom Buttons */}

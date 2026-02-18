@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -31,11 +31,31 @@ export default function MachineryPage() {
 
   const toggleMachinery = (item) => {
     if (selectedMachinery.includes(item)) {
-      setSelectedMachinery(selectedMachinery.filter((m) => m !== item));
+      setSelectedMachinery(
+        selectedMachinery.filter((m) => m !== item)
+      );
     } else {
       setSelectedMachinery([...selectedMachinery, item]);
     }
   };
+
+  // 🔥 SAVE / MERGE INTO reportData (KEY = machines)
+  const saveMachinesData = (machinesArray) => {
+    const existingData =
+      JSON.parse(localStorage.getItem("reportData")) || {};
+
+    const updatedData = {
+      ...existingData,
+      machines: machinesArray,
+    };
+
+    localStorage.setItem("reportData", JSON.stringify(updatedData));
+  };
+
+  // 🔥 AUTO SAVE WHEN MACHINERY CHANGES
+  useEffect(() => {
+    saveMachinesData(selectedMachinery);
+  }, [selectedMachinery]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-6">
@@ -77,12 +97,7 @@ export default function MachineryPage() {
       </div>
 
       {/* Machinery Grid */}
-      <div className="grid gap-6 
-                      grid-cols-1 
-                      sm:grid-cols-2 
-                      md:grid-cols-3 
-                      lg:grid-cols-4">
-
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {filteredList.length > 0 ? (
           filteredList.map((item, index) => {
             const isSelected = selectedMachinery.includes(item);

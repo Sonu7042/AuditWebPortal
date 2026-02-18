@@ -18,7 +18,6 @@ import {
   FileSearch,
 } from "lucide-react";
 
-// Sub-components
 import ProjectHeader from "./ProjectCompaniesComponents/ProjectHeader";
 import TopInfoBar from "./ProjectCompaniesComponents/TopInfoBar";
 import CompanySelection from "./ProjectCompaniesComponents/CompanySelection";
@@ -32,41 +31,17 @@ import AttentionModal from "./ProjectCompaniesComponents/AttentionModal";
 export default function ProjectCompanies() {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedAudit, setSelectedAudit] = useState(null);
+  const [checkedServices, setCheckedServices] = useState([]);
   const [showAttentionModal, setShowAttentionModal] = useState(false);
-  const [clickedIndex, setClickedIndex] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine current view from URL
   const isSummary = location.pathname.includes("/summary");
   const isReport = location.pathname.includes("/report");
   const isPhases = location.pathname.includes("/phases");
   const isAudit = !isSummary && !isReport && !isPhases;
-
-  // ✅ Countdown Timer Logic
-  const [secondsLeft, setSecondsLeft] = useState(24 * 60 * 60 - 60);
-
-  useEffect(() => {
-    let interval;
-    if (showAttentionModal && secondsLeft > 0) {
-      interval = setInterval(() => {
-        setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [showAttentionModal, secondsLeft]);
-
-  const formatTime = (totalSeconds) => {
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
-    return `${h} hours ${m} minutes ${s} seconds`;
-  };
-
-  const [showModal, setShowModal] = useState(false);
-  const [activeServiceIndex, setActiveServiceIndex] = useState(null);
-  const [checkedServices, setCheckedServices] = useState([]);
 
   const companies = [
     "INDERJEET BROS PROJECTS PVT. LTD.",
@@ -105,39 +80,66 @@ export default function ProjectCompanies() {
       title: "PREVENTIVE MANAGEMENT",
       icon: <ShieldCheck size={40} />,
       badge: "1",
-      link: "/pendingNonCompliance"
+      link: "/pendingNonCompliance",
     },
-    {
-      title: "PREVENTIVE PLAN",
-      icon: <ClipboardCheck size={40} />,
-      link: "#"
-    },
-    {
-      title: "WORKERS",
-      icon: <Users size={40} />,
-      link: "/workers"
-    },
-    {
-      title: "MACHINERY",
-      icon: <Settings size={40} />,
-      link: "/machine"
-    },
-    {
-      title: "ANCILLARY MEASURES",
-      icon: <Package size={40} />,
-      link: "/ancillary"
-    },
+    { title: "PREVENTIVE PLAN", icon: <ClipboardCheck size={40} />, link: "#" },
+    { title: "WORKERS", icon: <Users size={40} />, link: "/workers" },
+    { title: "MACHINERY", icon: <Settings size={40} />, link: "/machine" },
+    // {
+    //   title: "ANCILLARY MEASURES",
+    //   icon: <Package size={40} />,
+    //   link: "/ancillary",
+    // },
     {
       title: "CHEMICAL PRODUCTS",
       icon: <FlaskConical size={40} />,
-      link: "/chemicalProducts"
+      link: "/chemicalProducts",
     },
     {
       title: "VISIT SHEET",
       icon: <FileSearch size={40} />,
-      link: "/visitSheet"
-    },
+      link: "/visitSheet",
+    },  
   ];
+
+  // 🔥 SAVE / MERGE INTO reportData
+  const saveProjectCompanyData = (company, audit, serviceIndexes = []) => {
+    const existingData = JSON.parse(localStorage.getItem("reportData")) || {};
+
+    const serviceTitles = serviceIndexes.map((index) => services[index]?.title);
+
+    const updatedData = {
+      ...existingData,
+      company: company ?? existingData.company ?? null,
+      auditType: audit ?? existingData.auditType ?? null,
+      services:
+        serviceTitles.length > 0
+          ? serviceTitles
+          : (existingData.services ?? []),
+    };
+
+    localStorage.setItem("reportData", JSON.stringify(updatedData));
+  };
+
+  // 🔥 HANDLERS
+  const handleCompanySelect = (company) => {
+    setSelectedCompany(company);
+    setSelectedAudit(null);
+    setCheckedServices([]);
+    saveProjectCompanyData(company, null, []);
+  };
+
+  const handleAuditSelect = (audit) => {
+    setSelectedAudit(audit);
+    saveProjectCompanyData(selectedCompany, audit, checkedServices);
+  };
+
+  // 🔥 Auto save when services change
+  useEffect(() => {
+    if (selectedCompany) {
+      saveProjectCompanyData(selectedCompany, selectedAudit, checkedServices);
+    }
+  }, [checkedServices]);
 
   return (
     <div className="h-screen bg-[#f5f6f7] flex flex-col relative overflow-hidden">
@@ -154,58 +156,61 @@ export default function ProjectCompanies() {
       <TopInfoBar />
 
       <Routes>
-        <Route path="report" element={<CompanyReportView reportSections={reportSections} />} />
-        <Route path="summary" element={
-          <SummaryView
-            companies={companies}
-          />
-        } />
-        <Route path="/*" element={
-          <div className="flex flex-1">
-            <CompanySelection
-              companies={companies}
-              selectedCompany={selectedCompany}
-              setSelectedCompany={setSelectedCompany}
-              setSelectedAudit={setSelectedAudit}
-              selectedAudit={selectedAudit}
-              checkedServices={checkedServices}
-              services={services}
-            />
-            <div className="w-1/2 flex flex-col bg-white">
-              <div className="h-12 flex items-center justify-between px-6 border-b border-gray-200 bg-[#f9fafb]">
-                <p className="text-sm font-medium text-gray-700">
-                  {isPhases ? `Add project phases to ${selectedCompany}` : "Phases selected by the supplier"}
-                </p>
-                <FileSearch size={16} className="text-gray-500" />
-              </div>
+        <Route
+          path="report"
+          element={<CompanyReportView reportSections={reportSections} />}
+        />
 
-              {!selectedCompany ? (
-                <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
-                  Select a company
-                </div>
-              ) : (
-                <Routes>
-                  <Route path="phases" element={
-                    <ServiceGrid
-                      services={services}
-                      checkedServices={checkedServices}
-                      setCheckedServices={setCheckedServices}
-                      setActiveServiceIndex={setActiveServiceIndex}
-                      setShowModal={setShowModal}
+        <Route path="summary" element={<SummaryView companies={companies} />} />
+
+        <Route
+          path="/*"
+          element={
+            <div className="flex flex-1">
+              <CompanySelection
+                companies={companies}
+                selectedCompany={selectedCompany}
+                setSelectedCompany={handleCompanySelect}
+                selectedAudit={selectedAudit}
+                checkedServices={checkedServices}
+                services={services}
+              />
+
+              <div className="w-1/2 flex flex-col bg-white">
+                {!selectedCompany ? (
+                  <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
+                    Select a company
+                  </div>
+                ) : (
+                  <Routes>
+                    <Route
+                      path="phases"
+                      element={
+                        <ServiceGrid
+                          services={services}
+                          checkedServices={checkedServices}
+                          setCheckedServices={setCheckedServices}
+                          setShowModal={setShowModal}
+                        />
+                      }
                     />
-                  } />
-                  <Route path="/" element={
-                    <AuditGrid
-                      audits={audits}
-                      selectedAudit={selectedAudit}
-                      setSelectedAudit={setSelectedAudit}
+
+                    <Route
+                      path="/"
+                      element={
+                        <AuditGrid
+                          audits={audits}
+                          selectedAudit={selectedAudit}
+                          setSelectedAudit={handleAuditSelect}
+                        />
+                      }
                     />
-                  } />
-                </Routes>
-              )}
+                  </Routes>
+                )}
+              </div>
             </div>
-          </div>
-        } />
+          }
+        />
       </Routes>
 
       {showModal && (
@@ -217,22 +222,10 @@ export default function ProjectCompanies() {
 
       {showAttentionModal && (
         <AttentionModal
-          formatTime={formatTime}
-          secondsLeft={secondsLeft}
+          secondsLeft={0}
           setShowAttentionModal={setShowAttentionModal}
         />
       )}
-
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        @keyframes scale-in {
-          from { transform: scale(0.9); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        .scale-in {
-          animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-      ` }} />
     </div>
   );
 }

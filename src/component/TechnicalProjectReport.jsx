@@ -16,21 +16,40 @@ export default function TechnicalProjectReport() {
 
   const [market, setMarket] = useState("INDIA");
   const [promoter, setPromoter] = useState(
-    "INDITEX TRENT RETAIL INDIA PRIVATE, LTD."
+    "INDITEX TRENT RETAIL INDIA PRIVATE, LTD.",
   );
   const [project, setProject] = useState(
-    "BANGALORE - SANJEEVINI NAGAR - YES - BERSHKA - MALL OF ASIA - INITIAL PROJECT 0"
+    "BANGALORE - SANJEEVINI NAGAR - YES - BERSHKA - MALL OF ASIA - INITIAL PROJECT 0",
   );
   const [visitDate, setVisitDate] = useState(today);
 
+
+
+
+  const handleCreateReport = () => {
+  const reportData = {
+    market,
+    promoter,
+    project,
+    visitDate,
+    createdAt: new Date().toISOString(),
+  };
+
+  // Save to localStorage
+  localStorage.setItem("reportData", JSON.stringify(reportData));
+
+  // Navigate
+  navigate("/projecCompanies", { replace: true });
+};
+
+
   return (
     <div className="h-screen bg-[#f5f6f7] flex flex-col">
-
       {/* ===== Top Header ===== */}
       <div className="h-14 flex items-center justify-center relative border-b border-gray-300 bg-[#f5f6f7]">
-         <Link to="/dashboard" >
-        <ArrowLeft className="absolute left-4 text-gray-600" size={20} />
-         </Link>
+        <Link to="/dashboard">
+          <ArrowLeft className="absolute left-4 text-gray-600" size={20} />
+        </Link>
         <h1 className="text-sm tracking-widest font-medium text-gray-700">
           TECHNICAL PROJECT REPORT
         </h1>
@@ -38,10 +57,8 @@ export default function TechnicalProjectReport() {
 
       {/* ===== Split Layout ===== */}
       <div className="flex flex-1">
-
         {/* ===== LEFT SIDE ===== */}
         <div className="w-1/2 border-r border-gray-300 flex flex-col">
-
           {/* Section Header */}
           <div className="h-12 flex items-center justify-between px-6 border-b border-gray-200">
             <p className="text-xs text-gray-600">
@@ -85,12 +102,10 @@ export default function TechnicalProjectReport() {
             <div className="flex items-center gap-4">
               <MapPin size={20} className="text-gray-400" />
               <div>
-                <p className="text-[11px] text-gray-400">
-                  Select project
-                </p>
+                <p className="text-[11px] text-gray-400">Select project</p>
                 <p className="text-sm text-gray-700 leading-snug">
-                  BANGALORE - SANJEEVINI NAGAR - YES - BERSHKA -
-                  MALL OF ASIA - INITIAL PROJECT 0
+                  BANGALORE - SANJEEVINI NAGAR - YES - BERSHKA - MALL OF ASIA -
+                  INITIAL PROJECT 0
                 </p>
               </div>
             </div>
@@ -99,7 +114,6 @@ export default function TechnicalProjectReport() {
         </div>
         {/* ===== RIGHT SIDE ===== */}
         <div className="w-1/2 flex flex-col relative">
-
           {/* Section Header */}
           <div className="h-12 flex items-center justify-between px-6 border-b border-gray-200">
             <p className="text-xs text-gray-600">Select visit date</p>
@@ -125,7 +139,7 @@ export default function TechnicalProjectReport() {
           {/* Bottom Button */}
           <div className="absolute bottom-8 right-10">
             <button
-              onClick={() => navigate("/projecCompanies", { replace: true })}
+              onClick={handleCreateReport}
               className="px-5 py-2 text-sm border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 transition"
             >
               Create report and continue
