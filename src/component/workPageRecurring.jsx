@@ -4,14 +4,27 @@ import { AppContext } from "../context/AppContext";
 
 const WorkPageRecurring = () => {
 
-  const { sectionId, questionId } = useParams();
+  const { sectionId, subId, questionId } = useParams();
   const navigate = useNavigate();
-  const { auditSections, updateQuestionStatus, synchroniseQuestion } = useContext(AppContext);
+  const { auditSections, updateQuestionStatus, synchroniseQuestion } =
+    useContext(AppContext);
 
-  const section = auditSections.find(s => s.id === Number(sectionId));
+  // 🔥 Find Section
+  const section = auditSections.find(
+    (s) => s.id === Number(sectionId)
+  );
   if (!section) return <div>Section Not Found</div>;
 
-  const question = section.questions.find(q => q.id === Number(questionId));
+  // 🔥 Find SubSection
+  const subSection = section.subSections.find(
+    (sub) => sub.id === Number(subId)
+  );
+  if (!subSection) return <div>SubSection Not Found</div>;
+
+  // 🔥 Find Question
+  const question = subSection.questions.find(
+    (q) => q.id === Number(questionId)
+  );
   if (!question) return <div>Question Not Found</div>;
 
   const [image1, setImage1] = useState(null);
@@ -64,13 +77,25 @@ const WorkPageRecurring = () => {
 
       <div className="grid grid-cols-2 gap-6">
         <div>
-          <textarea className="w-full border p-2 mb-4" placeholder="Description" />
-          <input type="file" onChange={(e) => setImage1(e.target.files[0])} />
+          <textarea
+            className="w-full border p-2 mb-4"
+            placeholder="Description"
+          />
+          <input
+            type="file"
+            onChange={(e) => setImage1(e.target.files[0])}
+          />
         </div>
 
         <div>
-          <textarea className="w-full border p-2 mb-4" placeholder="Corrective Measure" />
-          <input type="file" onChange={(e) => setImage2(e.target.files[0])} />
+          <textarea
+            className="w-full border p-2 mb-4"
+            placeholder="Corrective Measure"
+          />
+          <input
+            type="file"
+            onChange={(e) => setImage2(e.target.files[0])}
+          />
         </div>
       </div>
 

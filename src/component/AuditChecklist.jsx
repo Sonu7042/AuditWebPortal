@@ -1,29 +1,42 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import {
-  FaThumbsUp,
-  FaThumbsDown,
   FaChevronDown,
   FaChevronRight,
-  FaArrowLeft,
-  FaHome,
-  FaQuestionCircle,
+  FaThumbsUp,
+  FaThumbsDown,
   FaBuilding,
-  FaHardHat,
-  FaBroom,
-  FaTools,
-  FaShieldAlt,
-  FaIndustry,
 } from "react-icons/fa";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Home, HelpCircle } from "lucide-react";
 
 const AuditChecklist = () => {
-  const { auditSections } = useContext(AppContext);
+  const { auditSections, addNewQuestion } = useContext(AppContext);
   const navigate = useNavigate();
 
   const [openMain, setOpenMain] = useState(null);
   const [openSub, setOpenSub] = useState(null);
+  const [newQuestions, setNewQuestions] = useState({});
+  const [visitedMains, setVisitedMains] = useState([]);
+
+  // 🔥 LOAD VISITED MAINS
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("visitedMains")) || [];
+    setVisitedMains(saved);
+  }, []);
+
+  // 🔥 SAVE VISITED MAINS
+  useEffect(() => {
+    localStorage.setItem("visitedMains", JSON.stringify(visitedMains));
+  }, [visitedMains]);
+
+  const handleMainClick = (id) => {
+    if (!visitedMains.includes(id)) {
+      setVisitedMains([...visitedMains, id]);
+    }
+
+    setOpenMain(openMain === id ? null : id);
+  };
 
   const getCounts = (questions) => {
     const up = questions.filter((q) => q.status === "up").length;
@@ -32,123 +45,102 @@ const AuditChecklist = () => {
     return { up, down, na };
   };
 
-  // 🔥 Different Icons for Each Main
-  const sectionIcons = [
-    FaBuilding,
-    FaHardHat,
-    FaBroom,
-    FaTools,
-    FaShieldAlt,
-    FaIndustry,
-  ];
-
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP HEADER ================= */}
-      <div className="bg-white border-b h-24 flex items-center justify-between px-6">
-
-        <button
-              onClick={() => navigate(-1)}
-              className="p-2 rounded-lg hover:bg-gray-100 transition"
-            >
-              <ChevronLeft size={30} />
-            </button>
-
-        <h1 className="text-[22px] font-semibold tracking-wide text-gray-800">
+      {/* HEADER */}
+      <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
+        <ChevronLeft size={28} className="cursor-pointer" />
+        <h1 className="font-semibold text-gray-800 tracking-wide">
           INDERJEET BROS PROJECTS PVT. LTD.
         </h1>
-
-        <div className="w-5"></div>
+        <div className="w-6"></div>
       </div>
 
-      {/* ================= PREVENTIVE BAR ================= */}
-      <div className="bg-gray-100 border-b h-18 flex items-center justify-between px-6 text-sm">
-        <div className="flex items-center gap-4">
-        <div className="font-medium text-gray-700 text-[20px] leading-tight">
-          PREVENTIVE MANAGEMENT
-        </div>
-        <div className="text-gray-600 text-md">
-          Click on corrosponding phase to assets its risks
-        </div>
+      {/* PREVENTIVE BAR */}
+      <div className="bg-gray-50 border-b px-6 py-3 flex items-center justify-between">
+        <div>
+          <p className="font-semibold text-gray-700">
+            PREVENTIVE MANAGEMENT
+          </p>
+          <p className="text-sm text-gray-500">
+            Click on the corresponding phase to assess its risks
+          </p>
         </div>
 
-        <div className="flex items-center gap-6 text-gray-600">
-          <FaHome size={26} className="cursor-pointer" />
-          <FaQuestionCircle size={26} className="cursor-pointer" />
+        <div className="flex gap-4 text-gray-600">
+          <Home size={22} />
+          <HelpCircle size={22} />
         </div>
       </div>
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* MAIN LIST */}
       <div className="bg-white">
 
-        {auditSections.map((section, index) => {
-          const mainCounts = getCounts(section.questions);
+        {auditSections.map((section) => {
 
-          const mid = Math.ceil(section.questions.length / 2);
-          const subGroups = [
-            {
-              id: 1,
-              title: "01. RISKS RELATED TO PROJECT IMPLEMENTATION",
-              questions: section.questions.slice(0, mid),
-            },
-            {
-              id: 2,
-              title: "02. ADDITIONAL RISK CHECKS",
-              questions: section.questions.slice(mid),
-            },
-          ];
+          const allQuestions = section.subSections.flatMap(
+            (sub) => sub.questions
+          );
 
-          const IconComponent =
-            sectionIcons[index % sectionIcons.length];
+          const mainCounts = getCounts(allQuestions);
+
+          const isVisited = visitedMains.includes(section.id);
 
           return (
             <div key={section.id} className="border-b">
 
-              {/* ================= MAIN ================= */}
+              {/* MAIN ROW */}
               <div
-                onClick={() =>
-                  setOpenMain(openMain === section.id ? null : section.id)
-                }
-                className="flex justify-between items-center px-8 py-7 cursor-pointer"
+                onClick={() => handleMainClick(section.id)}
+                className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50"
               >
                 <div className="flex items-center gap-4">
 
-                  <div className="bg-green-600 text-white p-2 rounded-full">
-                    <IconComponent size={24} />
+                  {/* 🔥 ICON COLOR FIXED */}
+                  <div
+                    className={`p-3 rounded-full ${
+                      isVisited
+                        ? "bg-green-100 text-green-600"
+                        : "bg-red-100 text-red-600"
+                    }`}
+                  >
+                    <FaBuilding size={18} />
                   </div>
 
-                  {openMain === section.id ? (
-                    <FaChevronDown size={18} />
-                  ) : (
-                    <FaChevronRight size={18} />
-                  )}
-
-                  <h2 className="text-base font-semibold text-gray-800 uppercase">
-                    {section.title || "GENERAL PROJECT STATUS"}
-                  </h2>
+                  <span className="font-semibold text-gray-800">
+                    {section.title}
+                  </span>
                 </div>
 
-                <div className="flex items-center gap-6 text-sm font-medium">
+                <div className="flex items-center gap-6 text-sm">
+
                   <div className="flex items-center gap-1 text-green-600">
-                    <FaThumbsUp size={14} />
+                    <FaThumbsUp />
                     ({mainCounts.up})
                   </div>
 
                   <div className="flex items-center gap-1 text-red-600">
-                    <FaThumbsDown size={14} />
+                    <FaThumbsDown />
                     ({mainCounts.down})
                   </div>
 
-                  <div className="text-orange-500">
+                  <div className="text-orange-500 font-medium">
                     NOT APPLICABLE ({mainCounts.na})
                   </div>
+
+                  {openMain === section.id ? (
+                    <FaChevronDown />
+                  ) : (
+                    <FaChevronRight />
+                  )}
                 </div>
               </div>
 
-              {/* ================= SUB MAIN ================= */}
+              {/* SUB SECTIONS */}
               {openMain === section.id &&
-                subGroups.map((sub, subIndex) => {
+                section.subSections.map((sub) => {
+
                   const subCounts = getCounts(sub.questions);
 
                   return (
@@ -162,92 +154,107 @@ const AuditChecklist = () => {
                               : `${section.id}-${sub.id}`
                           )
                         }
-                        className="flex justify-between items-center px-14 py-3 bg-gray-50 cursor-pointer"
+                        className="flex items-center justify-between px-12 py-3 cursor-pointer hover:bg-gray-50"
                       >
                         <div className="flex items-center gap-3">
-
                           <div className="w-3 h-3 bg-green-600"></div>
-
-                          {openSub === `${section.id}-${sub.id}` ? (
-                            <FaChevronDown size={12} />
-                          ) : (
-                            <FaChevronRight size={12} />
-                          )}
-
-                          <h3 className="text-sm font-medium text-gray-700">
+                          <span className="text-gray-700 font-medium">
                             {sub.title}
-                          </h3>
+                          </span>
                         </div>
 
-                        <div className="flex items-center gap-6 text-xs">
-                          <span className="text-green-600 flex items-center gap-1">
-                            <FaThumbsUp size={12} />
+                        <div className="flex items-center gap-6 text-sm">
+
+                          <div className="flex items-center gap-1 text-green-600">
+                            <FaThumbsUp />
                             ({subCounts.up})
-                          </span>
+                          </div>
 
-                          <span className="text-red-600 flex items-center gap-1">
-                            <FaThumbsDown size={12} />
+                          <div className="flex items-center gap-1 text-red-600">
+                            <FaThumbsDown />
                             ({subCounts.down})
-                          </span>
+                          </div>
 
-                          <span className="text-orange-500">
+                          <div className="text-orange-500">
                             NOT APPLICABLE ({subCounts.na})
-                          </span>
+                          </div>
+
+                          {openSub === `${section.id}-${sub.id}` ? (
+                            <FaChevronDown size={14} />
+                          ) : (
+                            <FaChevronRight size={14} />
+                          )}
                         </div>
                       </div>
 
-                      {/* ================= QUESTIONS ================= */}
-                      {openSub === `${section.id}-${sub.id}` &&
-                        sub.questions.map((q, qIndex) => {
-                          const questionNumber = `01.${String(
-                            subIndex * mid + qIndex + 1
-                          ).padStart(2, "0")}`;
-
-                          return (
+                      {/* QUESTIONS */}
+                      {openSub === `${section.id}-${sub.id}` && (
+                        <>
+                          {sub.questions.map((q, index) => (
                             <div
                               key={q.id}
-                              className="flex justify-between items-center px-20 py-3 border-t text-sm hover:bg-gray-50"
+                              className="flex justify-between items-center px-20 py-3 border-t hover:bg-gray-50"
                             >
-                              <div className="flex gap-3 text-gray-700">
-                                <span className="font-medium">
-                                  {questionNumber}
-                                </span>
-                                <span>{q.question}</span>
-                              </div>
+                              <span className="text-sm text-gray-700">
+                                {sub.id}.{index + 1} - {q.question}
+                              </span>
 
-                              <div className="flex items-center gap-6 text-xs">
-
-                                <div className="text-green-600 flex items-center gap-1">
-                                  <FaThumbsUp size={12} />
-                                  {q.status === "up" ? 1 : 0}
-                                </div>
-
-                                <div className="text-red-600 flex items-center gap-1">
-                                  <FaThumbsDown size={12} />
-                                  {q.status === "down" ? 1 : 0}
-                                </div>
-
-                                {q.status === "na" && (
-                                  <span className="text-orange-500">
-                                    NOT APPLICABLE
-                                  </span>
-                                )}
-
-                                <button
-                                  disabled={q.isSynced}
-                                  onClick={() =>
-                                    navigate(
-                                      `/work/${section.id}/${q.id}/${q.status}`
-                                    )
-                                  }
-                                  className="text-blue-600 underline"
-                                >
-                                  Edit
-                                </button>
-                              </div>
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    `/work/${section.id}/${sub.id}/${q.id}/${q.status}`
+                                  )
+                                }
+                                className="text-blue-600 text-sm underline"
+                              >
+                                Edit
+                              </button>
                             </div>
-                          );
-                        })}
+                          ))}
+
+                          {/* ADD RISK BUTTON */}
+                          <div className="px-20 py-4 border-t flex gap-3">
+                            <input
+                              type="text"
+                              value={
+                                newQuestions[
+                                  `${section.id}-${sub.id}`
+                                ] || ""
+                              }
+                              onChange={(e) =>
+                                setNewQuestions({
+                                  ...newQuestions,
+                                  [`${section.id}-${sub.id}`]:
+                                    e.target.value,
+                                })
+                              }
+                              placeholder="Add risk..."
+                              className="flex-1 border px-3 py-2 rounded text-sm"
+                            />
+
+                            <button
+                              onClick={() => {
+                                const key = `${section.id}-${sub.id}`;
+                                const text = newQuestions[key];
+
+                                addNewQuestion(
+                                  section.id,
+                                  sub.id,
+                                  text
+                                );
+
+                                setNewQuestions({
+                                  ...newQuestions,
+                                  [key]: "",
+                                });
+                              }}
+                              className="border px-4 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200"
+                            >
+                              Add risk
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   );
                 })}
