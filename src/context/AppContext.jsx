@@ -213,8 +213,47 @@ export const AppProvider = ({ children }) => {
                 q.id === questionId ? { ...q, isSynced: true } : q,
               ),
             }
-          : section,
-      ),
+          : section
+      )     
+    );
+  };
+
+  // 🔥 ADD NEW QUESTION
+  const addNewQuestion = (sectionId, subId, questionText) => {
+    if (!questionText.trim()) {
+      alert("Please enter a question");
+      return;
+    }
+
+    setAuditSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              subSections: section.subSections.map((sub) =>
+                sub.id === subId
+                  ? {
+                      ...sub,
+                      questions: [
+                        ...sub.questions,
+                        {
+                          id:
+                            sub.questions.length > 0
+                              ? Math.max(...sub.questions.map(q => q.id)) + 1
+                              : 1,
+                          question: questionText,
+                          status: "na",
+                          isSynced: false,
+                          images: [],
+                          description: "",
+                        },
+                      ],
+                    }
+                  : sub
+              ),
+            }
+          : section
+      )
     );
   };
 
