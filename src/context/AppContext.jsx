@@ -269,6 +269,7 @@ export const AppProvider = ({ children }) => {
         synchroniseQuestion,
         visitedSections,
         setVisitedSections,
+        addNewQuestion
       }}
     >
       {children}
