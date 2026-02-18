@@ -105,7 +105,7 @@ export default function ProjectCompanies() {
       title: "PREVENTIVE MANAGEMENT",
       icon: <ShieldCheck size={40} />,
       badge: "1",
-      link: "/pendingNonCompliance"
+      link: "/audit-checklist"
     },
     {
       title: "PREVENTIVE PLAN",
