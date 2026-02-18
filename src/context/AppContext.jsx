@@ -1,8 +1,10 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
+
+
   // 🔹 WORK PAGE FORM DATA
   const [formData, setFormData] = useState({
     subcontractedCompany: "",
@@ -18,203 +20,222 @@ export const AppProvider = ({ children }) => {
   const [visitedSections, setVisitedSections] = useState([]);
 
 
-  // 🔹 AUDIT SECTIONS DATA
-  const [auditSections, setAuditSections] = useState([
+  // 🔹 INITIAL AUDIT STRUCTURE
+  const initialAuditSections = [
     {
       id: 1,
       title: "GENERAL PROJECT STATUS",
-      questions: [
+      subSections: [
         {
           id: 1,
-          question:
-            "Is project scope clearly defined as per ISO 9001 requirements?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
-        },
-        {
-          id: 2,
-          question:
-            "Are risk assessments conducted before starting site activities?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
-        },
-        {
-          id: 3,
-          question:
-            "Is documented information properly controlled and updated?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
-        },
-        {
-          id: 4,
-          question: "Are internal audits conducted periodically?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
-        },
-        {
-          id: 5,
-          question: "Is management review performed as per ISO standards?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
+          title: "01. RISKS RELATED TO PROJECT IMPLEMENTATION",
+          questions: [
+            {
+              id: 1,
+              question: "Is project scope clearly defined?",
+              status: "na",
+              isSynced: false,
+              images: [],
+              description: "",
+            },
+          ],
         },
       ],
     },
-
     {
       id: 2,
       title: "STRUCTURES",
-      questions: [
+      subSections: [
         {
           id: 1,
-          question: "Are structural drawings approved before execution?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
-        },
-        {
-          id: 2,
-          question: "Is reinforcement work inspected before concreting?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
-        },
-        {
-          id: 3,
-          question: "Are materials tested as per quality standards?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
-        },
-        {
-          id: 4,
-          question: "Is curing process followed as per procedure?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
+          title: "01. STRUCTURAL EXECUTION",
+          questions: [
+            {
+              id: 1,
+              question: "Are structural drawings approved?",
+              status: "na",
+              isSynced: false,
+              images: [],
+              description: "",
+            },
+          ],
         },
       ],
     },
-
     {
       id: 3,
       title: "LABOUR, BUILDING AND WORKS CLEANING",
-      questions: [
+      subSections: [
         {
           id: 1,
-          question: "Are workers provided with proper PPE?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
-        },
-        {
-          id: 2,
-          question: "Is housekeeping maintained at the construction site?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
+          title: "01. SAFETY & HOUSEKEEPING",
+          questions: [
+            {
+              id: 1,
+              question: "Are workers provided PPE?",
+              status: "na",
+              isSynced: false,
+              images: [],
+              description: "",
+            },
+          ],
         },
       ],
     },
-
     {
       id: 4,
       title: "INSTALLATIONS AND PLASTERBOARDING",
-      questions: [
+      subSections: [
         {
           id: 1,
-          question: "Are electrical installations tested before handover?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
+          title: "01. ELECTRICAL INSTALLATION",
+          questions: [
+            {
+              id: 1,
+              question: "Are electrical systems tested?",
+              status: "na",
+              isSynced: false,
+              images: [],
+              description: "",
+            },
+          ],
         },
       ],
     },
-
     {
       id: 5,
-      title: "WOODWORK (FURNITURE)/ METALWORK",
-      questions: [
+      title: "WOODWORK / METALWORK",
+      subSections: [
         {
           id: 1,
-          question: "Are welding procedures approved and documented?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
+          title: "01. FABRICATION",
+          questions: [
+            {
+              id: 1,
+              question: "Are welding procedures approved?",
+              status: "na",
+              isSynced: false,
+              images: [],
+              description: "",
+            },
+          ],
+        },
+        {
+          id: 2,
+          title: "02. WOOD WORK FABRICATION",
+          questions: [
+            {
+              id: 1,
+              question: "Are woodwork procedures approved?",
+              status: "na",
+              isSynced: false,
+              images: [],
+              description: "",
+            },
+          ],
         },
       ],
     },
-
     {
       id: 6,
       title: "PAINTING AND FINISHES",
-      questions: [
+      subSections: [
         {
           id: 1,
-          question: "Is surface preparation done before painting?",
-          status: "na",
-          isSynced: false,
-          images: [],
-          description: "",
+          title: "01. SURFACE PREPARATION",
+          questions: [
+            {
+              id: 1,
+              question: "Is surface preparation done?",
+              status: "na",
+              isSynced: false,
+              images: [],
+              description: "",
+            },
+          ],
         },
       ],
     },
-  ]);
+  ];
 
-  // 🔥 SAVE (Editable)
-  const updateQuestionStatus = (sectionId, questionId, status, data) => {
-    setAuditSections((prev) =>
-      prev.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              questions: section.questions.map((q) =>
-                q.id === questionId
-                  ? {
-                      ...q,
-                      status,
-                      images: [data.descriptionImage, data.correctiveImage],
-                      description: data.description,
-                    }
-                  : q,
-              ),
-            }
-          : section,
-      ),
+  const [auditSections, setAuditSections] = useState(initialAuditSections);
+
+  // 🔥 LOAD FROM LOCAL STORAGE
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("reportData")) || {};
+    if (saved.auditSections) {
+      setAuditSections(saved.auditSections);
+    }
+  }, []);
+
+  // 🔥 AUTO SAVE TO LOCAL STORAGE (SAFE MERGE)
+  useEffect(() => {
+    const existing = JSON.parse(localStorage.getItem("reportData")) || {};
+
+    localStorage.setItem(
+      "reportData",
+      JSON.stringify({
+        ...existing,
+        auditSections,
+      })
     );
-  };
+  }, [auditSections]);
 
-  // 🔥 SYNCHRONISE (Lock)
-  // 🔒 SYNCHRONISE (LOCK QUESTION)
-  const synchroniseQuestion = (sectionId, questionId) => {
+  // 🔥 UPDATE QUESTION STATUS
+  const updateQuestionStatus = (sectionId, subId, questionId, status, data) => {
     setAuditSections((prev) =>
       prev.map((section) =>
         section.id === sectionId
           ? {
               ...section,
-              questions: section.questions.map((q) =>
-                q.id === questionId ? { ...q, isSynced: true } : q,
+              subSections: section.subSections.map((sub) =>
+                sub.id === subId
+                  ? {
+                      ...sub,
+                      questions: sub.questions.map((q) =>
+                        q.id === questionId
+                          ? {
+                              ...q,
+                              status,
+                              images: [
+                                data?.descriptionImage || null,
+                                data?.correctiveImage || null,
+                              ].filter(Boolean),
+                              description: data?.description || "",
+                            }
+                          : q
+                      ),
+                    }
+                  : sub
               ),
             }
           : section
-      )     
+      )
+    );
+  };
+
+  // 🔥 SYNCHRONISE QUESTION
+  const synchroniseQuestion = (sectionId, subId, questionId) => {
+    setAuditSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              subSections: section.subSections.map((sub) =>
+                sub.id === subId
+                  ? {
+                      ...sub,
+                      questions: sub.questions.map((q) =>
+                        q.id === questionId
+                          ? { ...q, isSynced: true }
+                          : q
+                      ),
+                    }
+                  : sub
+              ),
+            }
+          : section
+      )
     );
   };
 
@@ -239,7 +260,7 @@ export const AppProvider = ({ children }) => {
                         {
                           id:
                             sub.questions.length > 0
-                              ? Math.max(...sub.questions.map(q => q.id)) + 1
+                              ? Math.max(...sub.questions.map((q) => q.id)) + 1
                               : 1,
                           question: questionText,
                           status: "na",
@@ -260,16 +281,16 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
-        formData,
+         formData,
         setFormData,
         savedMachinery,
         setSavedMachinery,
         auditSections,
         updateQuestionStatus,
         synchroniseQuestion,
+        addNewQuestion,
         visitedSections,
         setVisitedSections,
-        addNewQuestion
       }}
     >
       {children}
