@@ -209,7 +209,7 @@ export const AppProvider = ({ children }) => {
               })),
             }
           : section
-      )
+      )     
     );
   };
 
