@@ -34,6 +34,7 @@ export default function ProjectCompanies() {
   const [checkedServices, setCheckedServices] = useState([]);
   const [showAttentionModal, setShowAttentionModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(86400);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -80,7 +81,7 @@ export default function ProjectCompanies() {
       title: "PREVENTIVE MANAGEMENT",
       icon: <ShieldCheck size={40} />,
       badge: "1",
-      link: "/audit-checklist"
+      link: "/audit-checklist",
     },
     { title: "PREVENTIVE PLAN", icon: <ClipboardCheck size={40} />, link: "#" },
     { title: "WORKERS", icon: <Users size={40} />, link: "/workers" },
@@ -99,7 +100,7 @@ export default function ProjectCompanies() {
       title: "VISIT SHEET",
       icon: <FileSearch size={40} />,
       link: "/visitSheet",
-    },  
+    },
   ];
 
   // 🔥 SAVE / MERGE INTO reportData
@@ -141,6 +142,32 @@ export default function ProjectCompanies() {
     }
   }, [checkedServices]);
 
+  // 24 hours = 86400 seconds
+
+  // Format HH:MM:SS
+  const formatTime = (totalSeconds) => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setShowAttentionModal(false); // auto close
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="h-screen bg-[#f5f6f7] flex flex-col relative overflow-hidden">
       <ProjectHeader
@@ -161,7 +188,16 @@ export default function ProjectCompanies() {
           element={<CompanyReportView reportSections={reportSections} />}
         />
 
-        <Route path="summary" element={<SummaryView companies={companies} />} />
+        <Route
+          path="summary"
+          element={
+            <SummaryView
+              companies={companies}
+              secondsLeft={secondsLeft}
+              formatTime={formatTime}
+            />
+          }
+        />
 
         <Route
           path="/*"
@@ -222,7 +258,8 @@ export default function ProjectCompanies() {
 
       {showAttentionModal && (
         <AttentionModal
-          secondsLeft={0}
+          secondsLeft={secondsLeft}
+          formatTime={formatTime}
           setShowAttentionModal={setShowAttentionModal}
         />
       )}

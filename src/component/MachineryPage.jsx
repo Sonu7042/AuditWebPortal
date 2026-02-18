@@ -150,7 +150,7 @@ export default function MachineryPage() {
         </Link>
 
         <Link
-          to={"/nonConformities"}
+          to={"/nonConformities"} 
           className="border border-gray-400 text-gray-600 px-5 py-2 rounded-md hover:bg-gray-100 transition"
         >
           See Non-conformities

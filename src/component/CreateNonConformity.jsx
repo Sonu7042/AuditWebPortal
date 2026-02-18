@@ -12,13 +12,9 @@ import {
 import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
-
 export default function CreateNonConformity() {
-  const { formData, setFormData, savedMachinery, setSavedMachinery } =
-    useContext(AppContext);
-
-
-    const navigate = useNavigate();
+  const { formData, setFormData } = useContext(AppContext);
+  const navigate = useNavigate();
 
   // ✅ HANDLE TEXT CHANGE
   const handleChange = (e) => {
@@ -29,18 +25,27 @@ export default function CreateNonConformity() {
     }));
   };
 
+  // ✅ CONVERT IMAGE TO BASE64
+  const convertToBase64 = (file, field) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: reader.result,
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   // ✅ HANDLE IMAGE UPLOAD
   const handleImageUpload = (e, field) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: file,
-      }));
+      convertToBase64(file, field);
     }
   };
 
-  // ✅ CHECK IF ALL FIELDS FILLED
+  // ✅ VALIDATION
   const isFormValid =
     formData.subcontractedCompany.trim() !== "" &&
     formData.machinery.trim() !== "" &&
@@ -49,23 +54,35 @@ export default function CreateNonConformity() {
     formData.descriptionImage !== null &&
     formData.correctiveImage !== null;
 
- const handleSave = () => {
-  if (!isFormValid) return;
+  // ✅ SAVE INTO LOCALSTORAGE (KEY = createNonConformity)
+  const handleSave = () => {
+    if (!isFormValid) return;
 
-  setSavedMachinery((prev) => [...prev, formData]);
+    const existingData =
+      JSON.parse(localStorage.getItem("reportData")) || {};
 
-  setFormData({
-    subcontractedCompany: "",
-    machinery: "",
-    description: "",
-    correctiveMeasure: "",
-    descriptionImage: null,
-    correctiveImage: null,
-  });
+    const existingNC =
+      existingData.createNonConformity || [];
 
-  // ✅ Redirect
-  navigate("/machine");
-};
+    const updatedData = {
+      ...existingData,
+      createNonConformity: [...existingNC, formData],
+    };
+
+    localStorage.setItem("reportData", JSON.stringify(updatedData));
+
+    // Reset form
+    setFormData({
+      subcontractedCompany: "",
+      machinery: "",
+      description: "",
+      correctiveMeasure: "",
+      descriptionImage: null,
+      correctiveImage: null,
+    });
+
+    navigate("/machine", { replace: true });
+  };
 
   const handleSync = () => {
     if (!isFormValid) return;
@@ -74,8 +91,7 @@ export default function CreateNonConformity() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
-      {/* ================= HEADER ================= */}
-      <div className="bg-white border-b">
+    <div className="bg-white border-b">
         <div className="flex items-center justify-between px-6 py-3">
           <div className="flex items-center gap-4">
             <ArrowLeft size={20} className="text-gray-600 cursor-pointer" />
@@ -155,32 +171,13 @@ export default function CreateNonConformity() {
           </div>
         </div>
       </div>
-      <div className="w-full bg-[#f3f4f6] border-b">
-        <div className="flex items-center justify-between px-6 py-3">
-          {/* Center Text with Icon */}
-          <div className="flex items-center gap-2 text-gray-600 text-sm mx-auto">
-            <Wrench size={16} className="text-gray-400" />
-            <span>Enter data for unauthorised machinery</span>
-          </div>
 
-          {/* Right Icons */}
-          <div className="flex items-center gap-4 text-gray-500 absolute right-6">
-            <Home size={18} className="cursor-pointer hover:text-gray-700" />
-            <HelpCircle
-              size={18}
-              className="cursor-pointer hover:text-gray-700"
-            />
-          </div>
-        </div>
-      </div>
+      
 
-      {/* ================= BODY ================= */}
+      {/* BODY */}
       <div className="flex-1 px-6 py-6">
-        {/* Top Form Row */}
         <div className="flex flex-col lg:flex-row gap-6 mb-6">
-          {/* LEFT INPUT AREA */}
           <div className="flex-1 flex flex-col gap-4">
-            {/* Subcontracted Company (Input instead of dropdown) */}
             <div>
               <label className="text-xs text-gray-500">
                 Select the subcontracted company
@@ -194,7 +191,6 @@ export default function CreateNonConformity() {
               />
             </div>
 
-            {/* Machinery */}
             <div>
               <label className="text-xs text-gray-500">Machinery*</label>
               <input
@@ -206,66 +202,51 @@ export default function CreateNonConformity() {
               />
             </div>
           </div>
-
-          {/* STATUS BOX */}
-          <div className="w-full lg:w-[220px] border bg-white flex items-center justify-center gap-3 py-6">
-            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-              <span className="text-orange-500 text-lg">⏳</span>
-            </div>
-            <span className="text-orange-500 font-medium text-sm">Pending</span>
-          </div>
         </div>
 
-        {/* Description + Corrective Row */}
         <div className="flex flex-col md:flex-row gap-10">
           {/* DESCRIPTION */}
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-3 text-sm text-gray-600">
-              <MessageSquare size={16} />
-              Description of the non-conformity
-            </div>
-
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="bg-[#111827] text-white text-xs px-3 py-3 w-[90%] resize-none"
+              className="bg-[#111827] text-white text-xs px-3 py-3 w-[90%]"
               rows={4}
             />
 
-            <div className="mt-6 w-[140px] h-[100px] border-2 border-dashed flex items-center justify-center text-gray-400 relative">
+            <div className="mt-6 w-[140px] h-[100px] border-2 border-dashed relative">
               <ImagePlus size={24} />
               <input
                 type="file"
                 accept="image/*"
                 className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={(e) => handleImageUpload(e, "descriptionImage")}
+                onChange={(e) =>
+                  handleImageUpload(e, "descriptionImage")
+                }
               />
             </div>
           </div>
 
           {/* CORRECTIVE */}
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-3 text-sm text-gray-600">
-              <MessageSquare size={16} />
-              Corrective measure
-            </div>
-
             <textarea
               name="correctiveMeasure"
               value={formData.correctiveMeasure}
               onChange={handleChange}
-              className="bg-[#111827] text-white text-xs px-3 py-3 w-[90%] resize-none"
+              className="bg-[#111827] text-white text-xs px-3 py-3 w-[90%]"
               rows={4}
             />
 
-            <div className="mt-6 w-[140px] h-[100px] border-2 border-dashed flex items-center justify-center text-gray-400 relative">
+            <div className="mt-6 w-[140px] h-[100px] border-2 border-dashed relative">
               <ImagePlus size={24} />
               <input
                 type="file"
                 accept="image/*"
                 className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={(e) => handleImageUpload(e, "correctiveImage")}
+                onChange={(e) =>
+                  handleImageUpload(e, "correctiveImage")
+                }
               />
             </div>
           </div>
